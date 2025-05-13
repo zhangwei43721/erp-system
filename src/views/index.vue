@@ -1,0 +1,84 @@
+<script setup>
+import AddCustomer from "@/views/AddCustomer.vue";
+import ListCustomer from "@/views/ListCustomer.vue";
+import { onMounted, ref } from "vue";
+import axios from "axios";
+
+// 声明数组保存所有组件，按后端component值顺序映射
+const views = [
+  AddCustomer, // component: 0
+  ListCustomer, // component: 1
+];
+
+// 声明变量保存当前需要显示的组件
+const currentComponent = ref(views[0]);
+const menus = ref([]);
+
+/* menu组件选中叶子节点触发的函数，参数index：菜单节点的id */
+const handlerSelect = function (index) {
+  // 查找对应菜单项的component值
+  let componentIndex = 0;
+  menus.value.forEach((menu) => {
+    menu.subMenu.forEach((subMenu) => {
+      if (subMenu.id === parseInt(index)) {
+        componentIndex = subMenu.component;
+      }
+    });
+  });
+  // 动态设置currentComponent
+  currentComponent.value = views[componentIndex];
+};
+
+onMounted(() => {
+  axios
+    .get("http://localhost:8080/listMenus")
+    .then((response) => {
+      menus.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+</script>
+
+<template>
+  <div class="common-layout">
+    <el-container>
+      <el-header class="top">ERP-ikun小组</el-header>
+      <el-container>
+        <el-aside width="240px" class="left">
+          系统菜单
+          <el-menu class="el-menu-vertical-demo" @select="handlerSelect">
+            <el-sub-menu v-for="menu in menus" :index="menu.id.toString()">
+              <template #title>
+                <span>{{ menu.label }}</span>
+              </template>
+              <el-menu-item
+                v-for="subMenu in menu.subMenu"
+                :index="subMenu.id.toString()"
+              >
+                {{ subMenu.label }}
+              </el-menu-item>
+            </el-sub-menu>
+          </el-menu>
+        </el-aside>
+        <el-main class="right">
+          <component :is="currentComponent"></component>
+        </el-main>
+      </el-container>
+    </el-container>
+  </div>
+</template>
+
+<style scoped>
+.top {
+  background-color: azure;
+}
+.left {
+  background-color: blanchedalmond;
+  height: 600px;
+}
+.right {
+  background-color: cornsilk;
+}
+</style>
