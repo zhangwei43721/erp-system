@@ -15,15 +15,16 @@ const menus = ref([]);
 
 /* menu组件选中叶子节点触发的函数，参数index：菜单节点的id */
 const handlerSelect = function (index) {
-  console.log(index);
+  console.log("Selected index:", index); // 调试 id
   axios
     .get("http://localhost:8080/compIndex?id=" + index)
     .then((response) => {
-      const componentIndex = response.data; // 从后端获取 component 值
-      currentComponent.value = views[componentIndex]; // 动态设置组件
+      console.log("Response:", response.data); // 调试后端返回的 component 值
+      const componentIndex = response.data;
+      currentComponent.value = views[componentIndex];
     })
     .catch((error) => {
-      console.log(error);
+      console.log("Error:", error); // 捕获并显示错误
     });
 };
 
