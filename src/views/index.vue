@@ -3,15 +3,14 @@ import AddCustomer from "@/views/AddCustomer.vue";
 import ListCustomer from "@/views/ListCustomer.vue";
 import { onMounted, ref } from "vue";
 import axios from "axios";
-
+import { markRaw, shallowRef } from "vue";
 // 声明数组保存所有组件，按后端component值顺序映射
 const views = [
-  AddCustomer, // component: 0
-  ListCustomer, // component: 1
+  markRaw(AddCustomer),
+  markRaw(ListCustomer),
 ];
 
-// 声明变量保存当前需要显示的组件
-const currentComponent = ref(views[0]);
+const currentComponent = shallowRef(views[0]);
 const menus = ref([]);
 
 /* menu组件选中叶子节点触发的函数，参数index：菜单节点的id */
