@@ -16,17 +16,16 @@ const menus = ref([]);
 
 /* menu组件选中叶子节点触发的函数，参数index：菜单节点的id */
 const handlerSelect = function (index) {
-  // 查找对应菜单项的component值
-  let componentIndex = 0;
-  menus.value.forEach((menu) => {
-    menu.subMenu.forEach((subMenu) => {
-      if (subMenu.id === parseInt(index)) {
-        componentIndex = subMenu.component;
-      }
+  console.log(index);
+  axios
+    .get("http://localhost:8080/compIndex?id=" + index)
+    .then((response) => {
+      const componentIndex = response.data; // 从后端获取 component 值
+      currentComponent.value = views[componentIndex]; // 动态设置组件
+    })
+    .catch((error) => {
+      console.log(error);
     });
-  });
-  // 动态设置currentComponent
-  currentComponent.value = views[componentIndex];
 };
 
 onMounted(() => {
