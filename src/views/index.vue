@@ -1,6 +1,7 @@
 <script setup>
 import AddCustomer from "@/views/AddCustomer.vue";
 import ListCustomer from "@/views/ListCustomer.vue";
+import AddSellJh from "@/views/AddSellJh";
 import { onMounted, ref } from "vue";
 import axios from "axios";
 import { markRaw, shallowRef } from "vue";
@@ -8,6 +9,9 @@ import { markRaw, shallowRef } from "vue";
 const views = [
   markRaw(AddCustomer),
   markRaw(ListCustomer),
+  markRaw(AddSellJh),
+  markRaw(AddSellJh),
+  markRaw(AddSellJh),
 ];
 
 const currentComponent = shallowRef(views[0]);
