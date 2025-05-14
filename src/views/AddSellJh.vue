@@ -2,7 +2,8 @@
   <h2>销售开发</h2>
   <el-form :model="sellForm" label-width="120px">
     <el-form-item label="客户名称">
-
+      <!-- 客户选择下拉框: 选项动态从后端获取 -->
+      <!-- v-model绑定的是选中客户的ID -->
       <el-select
           v-model="sellForm.custid"
           class="m-2"
@@ -10,6 +11,8 @@
           size="large"
           style="width: 80%"
       >
+        <!-- v-for遍历custList (从后端获取的客户列表) 来动态生成选项 -->
+        <!-- :key为每个选项提供唯一标识, :label显示客户名称, :value是客户的ID -->
         <el-option
             v-for="item in custList"
             :key="item.id"
@@ -55,19 +58,20 @@ import {onMounted, reactive, ref} from "vue";
 import axios from "axios";
 //定义销售过程表单
 const sellForm=reactive({
-  custid:'',
+  custid:'',      // 存储选中的客户ID
   channelId:'',
   money:0.0,
   nowStep:'',
-  empId:100
+  empId:100     // 业务员ID，默认为100
 });
-//创建数组，封装客户信息
+//创建数组，用于封装从后端获取的所有客户信息 (用于客户名称下拉列表)
 const custList=ref([]);
-//页面挂在发送ajax请求，查询所有客户信息，填充下拉列表框
+
+//页面挂载时执行: 发送ajax请求，查询所有客户信息，用于填充客户名称的下拉列表框
 onMounted(function(){
-    axios.get("http://localhost:8080/listAllCust")
+    axios.get("http://localhost:8080/listAllCust") // API端点，获取所有客户列表
     .then((response)=>{
-        custList.value=response.data;
+        custList.value=response.data; // 将获取的客户数据赋值给custList
     })
     .catch((error)=>{
       console.log(error);
@@ -77,8 +81,10 @@ onMounted(function(){
 function subSellForm() {
   axios.post("http://localhost:8080/saveSellJh", sellForm)
     .then((response) => {
+      // 检查后端返回的业务状态码，确保操作成功
       if (response.data.code === 200) {
         console.log(response.data);
+        // 成功后清空表单, custid设为null，empId恢复默认值
         Object.assign(sellForm, {
           custid: null,
           channelId: '',

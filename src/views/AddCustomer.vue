@@ -1,22 +1,26 @@
 <script setup>
-import { reactive } from 'vue';
-import axios from 'axios';
+// --- 模块导入 ---
+import { reactive } from 'vue'; // reactive: 用于创建响应式对象
+import axios from 'axios';        // axios: 用于发送HTTP请求
 
-// 初始化响应式表单数据
+// --- 响应式状态定义 ---
+// 初始化响应式表单数据对象 (custForm)
 const custForm = reactive({
-  custName: '',
-  address: '',
-  phone: '',
-  custType: '',
-  grade: ''
+  custName: '',   // 客户名称
+  address: '',    // 联系地址
+  phone: '',      // 联系电话
+  custType: '',   // 客户职业
+  grade: ''       // 客户等级
 });
 
-// 声明提交表单的函数，发送异步请求
+// --- 方法定义 ---
+// 声明提交表单的函数 (subCustForm)
 function subCustForm() {
+  // 使用axios发送POST请求到后端API '/saveCust'，请求体为custForm对象
   axios.post("http://localhost:8080/saveCust", custForm)
-    .then((response) => {
-      console.log(response.data);
-      // 成功后清空表单
+    .then((response) => { // 请求成功的回调
+      console.log(response.data); // 打印后端返回的数据
+      // 提交成功后，清空表单各项数据
       Object.assign(custForm, {
         custName: '',
         address: '',
@@ -25,13 +29,15 @@ function subCustForm() {
         grade: ''
       });
     })
-    .catch((error) => {
-      console.error('提交失败:', error);
+    .catch((error) => { // 请求失败的回调
+      console.error('提交失败:', error); // 在控制台打印错误信息
+      // 实际项目中，这里通常会显示错误提示给用户
     });
 }
 
-// 定义重置表单的函数
+// 定义重置表单的函数 (resetForm)
 function resetForm() {
+  // 将表单各项数据重置为空字符串 (或初始默认值)
   Object.assign(custForm, {
     custName: '',
     address: '',
@@ -43,9 +49,16 @@ function resetForm() {
 </script>
 
 <template>
+  <!-- 页面主标题 -->
   <h2>添加客户信息</h2>
+  <!-- Element Plus 表单组件 (el-form) -->
+  <!-- :model="custForm" 将表单数据模型绑定到script部分的custForm响应式对象 -->
+  <!-- label-width="120px" 设置表单项标签的统一宽度 -->
   <el-form :model="custForm" label-width="120px">
+    <!-- 表单项 (el-form-item): 每个表单项包含一个标签(label)和一个输入控件 -->
     <el-form-item label="客户名称">
+      <!-- Element Plus 输入框 (el-input) -->
+      <!-- v-model="custForm.custName" 双向绑定输入框的值到custForm对象的custName属性 -->
       <el-input v-model="custForm.custName" style="width: 80%" />
     </el-form-item>
     <el-form-item label="联系地址">
@@ -55,7 +68,11 @@ function resetForm() {
       <el-input v-model="custForm.phone" style="width: 80%" />
     </el-form-item>
     <el-form-item label="客户职业">
+      <!-- Element Plus 选择器 (el-select) -->
+      <!-- v-model="custForm.custType" 双向绑定选择器的值到custForm对象的custType属性 -->
+      <!-- placeholder 设置未选择时的提示文本 -->
       <el-select v-model="custForm.custType" placeholder="请选择职业……" style="width: 80%">
+        <!-- 下拉选项 (el-option): label为显示文本, value为实际选中值 -->
         <el-option label="保密" value="保密" />
         <el-option label="金融" value="金融" />
         <el-option label="互联网" value="互联网" />
@@ -66,16 +83,22 @@ function resetForm() {
     <el-form-item label="客户等级">
       <el-input v-model="custForm.grade" style="width: 80%" />
     </el-form-item>
+    <!-- 表单操作按钮区域 -->
     <el-form-item>
+      <!-- Element Plus 按钮 (el-button) -->
+      <!-- type="primary" 设置按钮主题色为主色调 -->
+      <!-- @click="subCustForm" 点击时调用subCustForm方法 -->
       <el-button type="primary" @click="subCustForm">保存</el-button>
+      <!-- @click="resetForm" 点击时调用resetForm方法 -->
       <el-button @click="resetForm">取消</el-button>
     </el-form-item>
   </el-form>
 </template>
 
-<style scoped>
+<style scoped> /* scoped样式: CSS只作用于当前组件 */
+/* 设置表单的最大宽度并使其居中显示 */
 .el-form {
-  max-width: 600px;
-  margin: 20px auto;
+  max-width: 600px; /* 限制表单最大宽度 */
+  margin: 20px auto; /* 上下20px外边距，左右自动外边距实现水平居中 */
 }
 </style>
