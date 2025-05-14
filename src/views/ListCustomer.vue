@@ -10,11 +10,18 @@
     <el-table-column prop="grade" label="客户等级" />
     <el-table-column prop="hisTotal" label="消费总额" />
 
+    <el-table-column fixed="right" label="操作" width="120">
+      <template #default>
+        <el-button link type="primary" size="small">删除</el-button>
+        <el-button link type="primary" size="small">修改</el-button>
+      </template>
+    </el-table-column>
+
   </el-table>
   <hr />
 
   <el-pagination small background :page-size="3" :pager-count="10" layout="prev, pager, next" :total="total"
-    class="mt-4" />
+    class="mt-4" @current-change="handlerPageChange" />
 </template>
 
 <script setup>
@@ -26,10 +33,10 @@ const custList = ref([]);
 //定义客户列表总记录数
 const total = ref();
 //定义函数发送ajax请求加载列表数据
-function custListQeury() {
-  axios.get("http://localhost:8080/listCust")
+function custListQeury(pageNum) {
+  axios.get("http://localhost:8080/listCust?pageNum=" + pageNum)
     .then((response) => {
-      custList.value = response.data.custList;
+      custList.value = response.data.custlist;
       total.value = response.data.total;
     })
     .catch((error) => {
@@ -38,8 +45,12 @@ function custListQeury() {
 }
 //页面挂在加载客户列表数据
 onMounted(function () {
-  custListQeury();
+  custListQeury(1);
 });
+/*处理上一页，下一页按钮回调,value绑定需要提交的页码*/
+function handlerPageChange(value) {
+  custListQeury(value)
+}
 </script>
 
 <style scoped></style>
