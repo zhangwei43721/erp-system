@@ -2,8 +2,8 @@
   <h2>客户列表</h2>
 
   <el-table :data="custList" stripe style="width: 100%">
-    <el-table-column prop="id" label="客户编号" width="180" />
-    <el-table-column prop="custName" label="客户姓名" width="180" />
+    <el-table-column prop="id" label="客户编号"  />
+    <el-table-column prop="custName" label="客户姓名"  />
     <el-table-column prop="address" label="客户地址" />
     <el-table-column prop="phone" label="客户电话" />
     <el-table-column prop="custType" label="客户职业" />
@@ -19,7 +19,7 @@
   </el-table>
   <hr />
 
-  <el-pagination small background :page-size="3" :pager-count="10" layout="prev, pager, next" :total="total"
+  <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="total"
     class="mt-4" @current-change="handlerPageChange" />
 
   <!-- 回显客户信息的对话框 -->
@@ -151,7 +151,7 @@ function subCustForm() {
       axios.put("http://localhost:8080/updateCust", custForm)
         .then(() => {
           ElMessage.success("修改成功");
-          dialogCustVisible.value = false;
+          dialogCustVisible.value = false;//关闭弹窗
           custListQeury(1); // 刷新列表
         })
         .catch((error) => {
