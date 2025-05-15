@@ -42,7 +42,7 @@
       </el-select>
     </el-form-item>
     <el-form-item label="业务员">
-      <el-input v-model="sellForm.empId" style="width: 80%"/>
+      <el-input v-model="sellForm.empId" style="width: 80%" readonly="readonly"/>
     </el-form-item>
 
     <el-form-item>
@@ -56,6 +56,7 @@
 <script setup>
 import {onMounted, reactive, ref} from "vue";
 import axios from "axios";
+import {ElMessage} from "element-plus";
 //定义销售过程表单
 const sellForm=reactive({
   custid:'',      // 存储选中的客户ID
@@ -84,6 +85,7 @@ function subSellForm() {
       // 检查后端返回的业务状态码，确保操作成功
       if (response.data.code === 200) {
         console.log(response.data);
+        ElMessage.success('添加成功');
         // 成功后清空表单, custid设为null，empId恢复默认值
         Object.assign(sellForm, {
           custid: null,
@@ -93,9 +95,14 @@ function subSellForm() {
           empId: 100
         });
       }
+      else {
+        ElMessage.error('添加失败');
+        console.error('提交失败:', error);
+      }
     })
     .catch((error) => {
-      console.error('提交失败:', error);
+      ElMessage.error('添加失败');
+      console.error(error);
     });
 }
 </script>

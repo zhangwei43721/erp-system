@@ -11,7 +11,7 @@
     <el-table-column prop="phone" label="客户电话" />
     <el-table-column prop="custType" label="客户职业" />
     <el-table-column prop="grade" label="客户等级" />
-    <el-table-column prop="hisTotal" label="消费总额" />
+    <el-table-column prop="hisTotal" label="消费总额（元）" />
 
     <!-- 操作列: fixed固定在右侧, width设置宽度, #default作用域插槽自定义内容 (row代表当前行数据) -->
     <el-table-column fixed="right" label="操作" width="120">
