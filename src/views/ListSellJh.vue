@@ -3,7 +3,7 @@
 
   <el-table :data="sellJHList" stripe style="width: 100%">
     <el-table-column prop="id" label="计划编号" />
-    <el-table-column prop="custid" label="客户ID" />
+    <el-table-column prop="custName" label="客户" />
     <el-table-column prop="channelId" label="渠道ID" />
     <el-table-column prop="money" label="金额" />
     <el-table-column prop="nowStep" label="当前步骤" />
