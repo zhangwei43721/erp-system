@@ -1,5 +1,37 @@
 <template>
   <h2>客户订单列表</h2>
+<!-- 添加条件查询表单 -->
+  <el-form :inline="true" :model="condForm"
+    >
+    <el-form-item label="订单号">
+      <el-input v-model="condForm.id" />
+    </el-form-item>
+    <el-form-item label="订单状态" style="width: 22%">
+      <el-select
+          v-model="condForm.state"
+          placeholder="请选择订单状态....">
+        <el-option label="未出库" value="未出库" />
+        <el-option label="已出库" value="已出库" />
+        <el-option label="配送中" value="配送中" />
+        <el-option label="已收货" value="已收货" />
+
+      </el-select>
+    </el-form-item>
+    <br/>
+    <el-form-item label="客户姓名">
+      <el-input v-model="condForm.custName" />
+    </el-form-item>
+    <el-form-item label="商品名称">
+      <el-input v-model="condForm.itemName" />
+    </el-form-item>
+    <br/>
+
+    <el-form-item>
+      <el-button type="primary" @click="subQueryCond">查询</el-button>
+    </el-form-item>
+  </el-form>
+
+  <hr/>
   <el-table :data="orderList" stripe style="width: 100%">
     <el-table-column prop="id" label="订单编号" />
     <el-table-column prop="custName" label="客户姓名" />
@@ -85,8 +117,10 @@ const orderForm = reactive({
 
 // 加载订单列表
 function loadOrderList(pageNum) {
+  condForm.pageNum=pageNum;
   axios
-    .get(`http://localhost:8080/listOrder?pageNum=${pageNum}`)
+    // .get(`http://localhost:8080/listOrder?pageNum=${pageNum}`)
+    .post("http://localhost:8080/listOrder", condForm)
     .then((response) => {
       orderList.value = response.data.orderList;
       total.value = response.data.total;
@@ -95,7 +129,26 @@ function loadOrderList(pageNum) {
       console.log(error);
     });
 }
+//声明保存查询条件的表单数据
+const condForm=reactive({
+  id:'',
+  state:'',
+  custName:'',
+  itemName:''
+})
 
+//定义函数提交动态查询条件
+function subQueryCond(){
+  condForm.pageNum=1; //将原来页码重置为1
+  axios.post("http://localhost:8080/listOrder",condForm)
+      .then((response)=>{
+        orderList.value=response.data.orderList;
+        total.value=response.data.total;
+      })
+      .catch((error)=>{
+        console.log(error);
+      });
+}
 // 删除订单
 function deleteOrder(id) {
   ElMessageBox.confirm("确定删除该订单吗？", "提示", {
