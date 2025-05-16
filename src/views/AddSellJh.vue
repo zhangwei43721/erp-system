@@ -36,7 +36,7 @@
     </el-form-item>
     <el-form-item label="开发阶段">
       <el-select v-model="sellForm.nowStep" placeholder="请选择...." style="width: 80%">
-        <el-option label="解除" value="解除" />
+        <el-option label="接触" value="接触" />
         <el-option label="报价" value="报价" />
         <el-option label="签约" value="签约" />
       </el-select>
