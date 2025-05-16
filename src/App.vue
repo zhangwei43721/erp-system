@@ -4,6 +4,7 @@ import AddCustomer from "@/views/AddCustomer.vue";    // 导入 "添加客户" �
 import ListCustomer from "@/views/ListCustomer.vue";  // 导入 "客户列表" 视图组件
 import AddSellJh from "@/views/AddSellJh";            // 导入 "添加销售计划" (或其他类似功能) 视图组件
 import ListSellJh from "@/views/ListSellJh";        // 导入 "销售计划列表" 视图组件
+import ListCustOrder from "./views/ListCustOrder.vue";// 导入 "客户订单列表" 视图组件
 import { onMounted, ref } from "vue";                 // onMounted: 生命周期钩子, ref: 创建响应式数据
 import axios from "axios";                            // 用于HTTP请求
 import { markRaw, shallowRef } from "vue";          // markRaw: 标记对象不需代理, shallowRef: 创建浅层响应式ref
@@ -14,7 +15,7 @@ const views = [
   markRaw(AddCustomer),
   markRaw(ListCustomer),
   markRaw(AddSellJh),
-  markRaw(AddSellJh),
+  markRaw(ListCustOrder),
   markRaw(AddSellJh),
   markRaw(AddSellJh),
   markRaw(AddSellJh),
