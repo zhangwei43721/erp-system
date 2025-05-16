@@ -61,7 +61,8 @@ const sellJhForm = reactive({
   channelId: null,
   money: 0.0,
   nowStep: '',
-  empId: null
+  empId: null,
+  custName: ''
 });
 
 const rules = {
@@ -157,5 +158,4 @@ function handlerPageChange(value) {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
