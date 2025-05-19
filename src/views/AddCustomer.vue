@@ -50,7 +50,7 @@ function resetForm() {
 
 <template>
   <!-- 页面主标题 -->
-  <h2>添加客户信息</h2>
+  <h2 class="page-title">添加客户信息</h2>
   <!-- Element Plus 表单组件 (el-form) -->
   <!-- :model="custForm" 将表单数据模型绑定到script部分的custForm响应式对象 -->
   <!-- label-width="120px" 设置表单项标签的统一宽度 -->
@@ -97,8 +97,7 @@ function resetForm() {
 
 <style scoped> /* scoped样式: CSS只作用于当前组件 */
 /* 设置表单的最大宽度并使其居中显示 */
-.el-form {
-  max-width: 600px; /* 限制表单最大宽度 */
-  margin: 20px auto; /* 上下20px外边距，左右自动外边距实现水平居中 */
+.page-title {
+  margin: 0 0 0 0,auto;
 }
 </style>
