@@ -240,6 +240,12 @@ onMounted(() => {
   height: 100%;
   transition: width 0.3s ease;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.app-sidebar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 .menu-header {
@@ -286,6 +292,12 @@ onMounted(() => {
   border-radius: 8px;
   margin: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.app-main::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
 }
 
 /* 加载状态 */

@@ -86,7 +86,7 @@
       <el-text>投诉人:{{ question.custName }}</el-text><br />
       <el-text>投诉问题:{{ question.quesDesc }}</el-text>
       <!--   table    -->
-      <el-table :data="replaysList" stripe style="width: 100%">
+      <el-table :data="replaysList" stripe style="width: 100% ;height: 200px">
         <el-table-column prop="id" label="编号" />
         <el-table-column prop="redate" label="时间" />
         <el-table-column prop="score" label="评分" />
