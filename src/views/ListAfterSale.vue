@@ -47,7 +47,7 @@
       <template #default="scope">
         <el-button link type="primary" size="small" @click="openReplayDialog(scope.row.id)">处理
         </el-button>
-        <el-button link type="primary" size="small">查看处理详情
+        <el-button link type="primary" size="small" @click="loadQuestionReplayList(scope.row)">查看处理详情
         </el-button>
       </template>
     </el-table-column>
@@ -73,6 +73,45 @@
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
+
+  </el-dialog>
+
+
+  <!-- 添加对话框控件 -->
+  <!-- 回复列表对话框 -->
+  <el-dialog v-model="dialogReplayListVisible" width="80%">
+    <h2>回复列表</h2>
+    <div style="text-align: left">
+
+      <el-text>投诉人:{{ question.custName }}</el-text><br />
+      <el-text>投诉问题:{{ question.quesDesc }}</el-text>
+      <!--   table    -->
+      <el-table :data="replaysList" stripe style="width: 100%">
+        <el-table-column prop="id" label="编号" />
+        <el-table-column prop="redate" label="时间" />
+        <el-table-column prop="score" label="评分" />
+        <el-table-column prop="content" label="内容" />
+        <!--        <el-table-column fixed="right" label="操作" width="200">
+          <template #default="scope">
+            <el-button link type="primary" size="small"
+                       @click="openReplayDialog(scope.row.id)">处理
+            </el-button>
+            <el-button link type="primary" size="small"
+                       @click="loadQuestionReplayList(scope.row)">查看处理详情
+            </el-button>
+          </template>
+        </el-table-column>-->
+
+      </el-table>
+
+      <!--   分页    -->
+      <hr />
+
+      <el-pagination small background :page-size="3" :pager-count="10" layout="prev, pager, next" :total="totalReplay"
+        class="mt-4" @current-change="handlerReplayPageChange" />
+
+    </div>
+
 
   </el-dialog>
 </template>
@@ -135,6 +174,7 @@ function subReplayForm() {
     .then((response) => {
       if (response.data.code == 200) {
         dialogReplayVisible.value = false;
+        replayForm.content = '';  //清空回复内容
         ElMessage(response.data.msg);
       } else {
         ElMessage(response.data.msg);
@@ -144,7 +184,48 @@ function subReplayForm() {
       console.log(error);
     });
 }
+//定义回复列表对话框状态
+const dialogReplayListVisible = ref(false);
+//定义回显投诉人和投诉内容的对象数据
+const question = reactive({
+  custName: '',
+  quesDesc: ''
+})
+//定义total。保存回复总记录数
+const totalReplay = ref(0);
+//定义回复列表数据
+const replaysList = ref([]);
+//声明变量保存投诉id
+let qid = 0;
+//打开对话框加载恢复列表
+function loadQuestionReplayList(row) {
+  dialogReplayListVisible.value = true;
+  question.custName = row.custName;
+  question.quesDesc = row.question;
+  qid = row.id;
+  //发送ajax请求
+  axios.get("http://localhost:8080/listReplay?id=" + row.id)
+    .then((response) => {
+      replaysList.value = response.data.replayList;
+      totalReplay.value = response.data.total;
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+}
 
+//提交分页查询参数的请求
+function handlerReplayPageChange(pageNum) {
+  //发送ajax请求
+  axios.get("http://localhost:8080/listReplay?id=" + qid + "&pageNum=" + pageNum)
+    .then((response) => {
+      replaysList.value = response.data.replayList;
+      totalReplay.value = response.data.total;
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+}
 </script>
 
 <style scoped></style>
