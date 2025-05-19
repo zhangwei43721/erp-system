@@ -9,7 +9,7 @@ import ListCustOrder from "@/views/ListCustOrder.vue";  // 统一使用@别名
 import ListAfterSale from "@/views/ListAfterSale.vue";
 
 // Vue核心
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { markRaw, shallowRef } from "vue";
 
 // HTTP客户端
@@ -36,13 +36,14 @@ const views = [
   viewComponents.listAfterSale,
   viewComponents.listCustOrder,
   viewComponents.addSellJh,
-  viewComponents.addSellJh,  // 注意：这里有重复，可能是后端映射问题
-  viewComponents.addSellJh,  // 注意：这里有重复，可能是后端映射问题
+  viewComponents.addSellJh,
+  viewComponents.addSellJh,
   viewComponents.listSellJh,
 ];
 
 // 应用状态
 const currentComponent = shallowRef(views[0]);
+const currentComponentIndex = ref(0); // 跟踪当前组件索引，用于动画过渡
 const menus = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
@@ -54,29 +55,52 @@ const error = ref(null);
  */
 const handlerSelect = async (index) => {
   try {
-    isLoading.value = true;
+    // 先清除错误状态
     error.value = null;
-
+    
     // 发起GET请求，根据菜单ID获取对应组件的索引
     const response = await axios.get(`${API_BASE_URL}/compIndex`, {
       params: { id: index },
       timeout: 5000 // 设置超时时间
     });
-
-    const componentIndex = response.data;
-
+    
+    const compIndex = response.data;
+    
     // 验证返回的索引是否有效
-    if (componentIndex >= 0 && componentIndex < views.length) {
-      currentComponent.value = views[componentIndex];
+    if (compIndex >= 0 && compIndex < views.length) {
+      // 在更新组件前添加淡出效果
+      const mainContent = document.querySelector('.app-main');
+      if (mainContent) {
+        // 添加淡出类
+        mainContent.classList.add('content-fade-out');
+        
+        // 等待动画完成后再更新组件
+        setTimeout(() => {
+          // 更新组件
+          currentComponentIndex.value = compIndex;
+          currentComponent.value = views[compIndex];
+          
+          // 移除淡出类并添加淡入类
+          mainContent.classList.remove('content-fade-out');
+          mainContent.classList.add('content-fade-in');
+          
+          // 清除淡入类
+          setTimeout(() => {
+            mainContent.classList.remove('content-fade-in');
+          }, 300);
+        }, 150);
+      } else {
+        // 如果找不到元素，直接更新
+        currentComponentIndex.value = compIndex;
+        currentComponent.value = views[compIndex];
+      }
     } else {
-      console.warn(`Invalid component index received: ${componentIndex}`);
+      console.warn(`Invalid component index received: ${compIndex}`);
       error.value = '无法加载请求的组件';
     }
   } catch (err) {
     console.error('Failed to fetch component index:', err);
     error.value = '加载组件失败，请稍后再试';
-  } finally {
-    isLoading.value = false;
   }
 };
 
@@ -87,17 +111,20 @@ const fetchMenus = async () => {
   try {
     isLoading.value = true;
     error.value = null;
-
+    
     const response = await axios.get(`${API_BASE_URL}/listMenus`, {
       timeout: 5000
     });
-
-    menus.value = response.data;
+    
+    // 使用小延迟确保动画平滑
+    setTimeout(() => {
+      menus.value = response.data;
+      isLoading.value = false;
+    }, 100);
   } catch (err) {
     console.error('Failed to fetch menus:', err);
     error.value = '加载菜单失败，请刷新页面重试';
     menus.value = []; // 确保在出错时有一个有效的空数组
-  } finally {
     isLoading.value = false;
   }
 };
@@ -186,8 +213,8 @@ onMounted(() => {
 
         <!-- 主内容区域 -->
         <el-main class="app-main">
-          <!-- 加载状态 -->
-          <div v-if="isLoading && !currentComponent.value" class="loading-container">
+          <!-- 加载状态 - 使用绝对定位避免布局跳动 -->
+          <div v-if="isLoading" class="loading-overlay">
             <el-skeleton animated :rows="10" />
           </div>
 
@@ -195,10 +222,12 @@ onMounted(() => {
           <el-alert v-if="error && currentComponent.value" :title="error" type="error" show-icon
             style="margin-bottom: 15px" @close="error = null" />
 
-          <!-- 动态组件渲染 -->
-          <keep-alive>
-            <component :is="currentComponent"></component>
-          </keep-alive>
+          <!-- 动态组件渲染 - 使用简单容器 -->
+          <div class="component-container">
+            <keep-alive>
+              <component :is="currentComponent"></component>
+            </keep-alive>
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -277,11 +306,40 @@ onMounted(() => {
   padding: 20px;
   overflow-y: auto;
   height: 100%;
+  position: relative; /* 为加载遮罩层提供定位上下文 */
 }
 
 /* 加载状态 */
-.loading-container {
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(245, 247, 250, 0.9);
+  z-index: 10;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 组件过渡动画 - 使用纯 CSS 实现 */
+.component-container {
+  width: 100%;
+  height: 100%;
+}
+
+/* 内容区域淡出效果 */
+.content-fade-out {
+  opacity: 0.5;
+  transition: opacity 0.15s ease-out;
+}
+
+/* 内容区域淡入效果 */
+.content-fade-in {
+  opacity: 1;
+  transition: opacity 0.15s ease-in;
 }
 
 /* 响应式调整 */
