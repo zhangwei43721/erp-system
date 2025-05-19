@@ -1,6 +1,5 @@
 <script setup>
 // --- 模块导入 ---
-// 视图组件
 import AddCustomer from "@/views/AddCustomer.vue";
 import ListCustomer from "@/views/ListCustomer.vue";
 import AddSellJh from "@/views/AddSellJh.vue";
@@ -15,11 +14,13 @@ import { markRaw, shallowRef } from "vue";
 // HTTP客户端
 import axios from "axios";
 
+// Element Plus 图标
+import { Folder, Document, Menu as MenuIcon, HomeFilled, Refresh } from '@element-plus/icons-vue';
+
 // API基础URL
 const API_BASE_URL = 'http://localhost:8080';
 
 // --- 组件映射与状态定义 ---
-// 视图组件映射表
 const viewComponents = {
   addCustomer: markRaw(AddCustomer),
   listCustomer: markRaw(ListCustomer),
@@ -29,7 +30,6 @@ const viewComponents = {
   listSellJh: markRaw(ListSellJh)
 };
 
-// 组件索引数组
 const views = [
   viewComponents.addCustomer,
   viewComponents.listCustomer,
@@ -41,7 +41,6 @@ const views = [
   viewComponents.listSellJh,
 ];
 
-// 应用状态
 const currentComponent = shallowRef(views[0]);
 const currentComponentIndex = ref(0);
 const menus = ref([]);
@@ -49,10 +48,6 @@ const isLoading = ref(false);
 const error = ref(null);
 
 // --- 方法定义 ---
-/**
- * 处理菜单选择事件
- * @param {string|number} index - 被选中菜单节点的ID
- */
 const handlerSelect = async (index) => {
   try {
     error.value = null;
@@ -74,9 +69,6 @@ const handlerSelect = async (index) => {
   }
 };
 
-/**
- * 加载菜单数据
- */
 const fetchMenus = async () => {
   try {
     isLoading.value = true;
@@ -94,10 +86,8 @@ const fetchMenus = async () => {
   }
 };
 
-// --- 计算属性 ---
 const hasMenus = computed(() => menus.value && menus.value.length > 0);
 
-// --- 监听器 ---
 watch(error, (newError) => {
   if (newError) {
     setTimeout(() => {
@@ -106,7 +96,6 @@ watch(error, (newError) => {
   }
 });
 
-// --- 生命周期钩子 ---
 onMounted(() => {
   fetchMenus();
 });
@@ -118,6 +107,7 @@ onMounted(() => {
       <!-- 顶部Header区域 -->
       <el-header class="app-header">
         <div class="header-content">
+          <el-icon class="header-icon"><HomeFilled /></el-icon>
           <h1 class="app-title">ERP管理系统</h1>
           <span class="app-subtitle">ikun小组</span>
         </div>
@@ -126,16 +116,19 @@ onMounted(() => {
       <el-container class="content-container">
         <!-- 左侧Aside区域 (导航菜单) -->
         <el-aside width="240px" class="app-sidebar">
-          <div class="menu-header">系统菜单</div>
+          <div class="menu-header">
+            <el-icon><MenuIcon /></el-icon>
+            系统菜单
+          </div>
 
           <!-- 加载状态 -->
           <el-skeleton :loading="isLoading && !hasMenus" animated :count="3" v-if="isLoading && !hasMenus">
             <template #template>
-              <div style="padding: 10px">
+              <div style="padding: 12px">
                 <el-skeleton-item variant="text" style="width: 90%" />
-                <div style="margin-left: 20px; margin-top: 10px">
+                <div style="margin-left: 24px; margin-top: 12px">
                   <el-skeleton-item variant="text" style="width: 80%" />
-                  <el-skeleton-item variant="text" style="width: 80%; margin-top: 5px" />
+                  <el-skeleton-item variant="text" style="width: 80%; margin-top: 8px" />
                 </div>
               </div>
             </template>
@@ -148,16 +141,11 @@ onMounted(() => {
           <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened>
             <el-sub-menu v-for="menu in menus" :key="menu.id" :index="menu.id.toString()">
               <template #title>
-                <el-icon>
-                  <folder />
-                </el-icon>
+                <el-icon><Folder /></el-icon>
                 <span>{{ menu.label }}</span>
               </template>
-
               <el-menu-item v-for="subMenu in menu.subMenu" :key="subMenu.id" :index="subMenu.id.toString()">
-                <el-icon>
-                  <document />
-                </el-icon>
+                <el-icon><Document /></el-icon>
                 <span>{{ subMenu.label }}</span>
               </el-menu-item>
             </el-sub-menu>
@@ -165,7 +153,7 @@ onMounted(() => {
 
           <!-- 空菜单提示 -->
           <el-empty v-if="!isLoading && hasMenus === false && !error" description="暂无菜单数据">
-            <el-button type="primary" @click="fetchMenus">刷新</el-button>
+            <el-button type="primary" :icon="Refresh" @click="fetchMenus">刷新</el-button>
           </el-empty>
         </el-aside>
 
@@ -173,12 +161,12 @@ onMounted(() => {
         <el-main class="app-main">
           <!-- 加载状态 -->
           <div v-if="isLoading" class="loading-overlay">
-            <el-skeleton animated :rows="10" />
+            <el-skeleton animated :rows="8" />
           </div>
 
           <!-- 错误提示 -->
           <el-alert v-if="error && currentComponent.value" :title="error" type="error" show-icon
-            style="margin-bottom: 15px" @close="error = null" />
+            style="margin-bottom: 16px" @close="error = null" />
 
           <!-- 动态组件渲染 -->
           <div class="component-container">
@@ -198,6 +186,7 @@ onMounted(() => {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: #f0f2f5;
 }
 
 .main-container {
@@ -206,65 +195,97 @@ onMounted(() => {
 }
 
 .content-container {
-  height: calc(100vh - 60px);
+  height: calc(100vh - 64px);
 }
 
 /* 头部样式 */
 .app-header {
-  height: 60px;
-  background-color: #409EFF;
-  color: white;
+  height: 64px;
+  background: linear-gradient(90deg, #2b5aff, #409eff);
+  color: #ffffff;
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header-content {
   display: flex;
   align-items: center;
+  gap: 12px;
+}
+
+.header-icon {
+  font-size: 24px;
 }
 
 .app-title {
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .app-subtitle {
-  margin-left: 10px;
-  font-size: 0.9rem;
-  opacity: 0.8;
+  font-size: 0.95rem;
+  font-weight: 400;
+  opacity: 0.85;
 }
 
 /* 侧边栏样式 */
 .app-sidebar {
-  background-color: #f5f7fa;
-  border-right: 1px solid #e6e6e6;
+  background-color: #ffffff;
+  border-right: 1px solid #e8ecef;
   overflow-y: auto;
   height: 100%;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
 }
 
 .menu-header {
-  padding: 15px;
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #606266;
-  border-bottom: 1px solid #e6e6e6;
+  padding: 16px 20px;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #303133;
+  border-bottom: 1px solid #e8ecef;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .app-menu {
   border-right: none;
+  background-color: transparent;
+}
+
+.app-menu :deep(.el-sub-menu__title),
+.app-menu :deep(.el-menu-item) {
+  color: #303133;
+  font-size: 0.95rem;
+}
+
+.app-menu :deep(.el-sub-menu__title:hover),
+.app-menu :deep(.el-menu-item:hover) {
+  background-color: #e6f0ff;
+  color: #2b5aff;
+}
+
+.app-menu :deep(.el-menu-item.is-active) {
+  background-color: #e6f0ff;
+  color: #2b5aff;
+  font-weight: 500;
 }
 
 /* 主内容区域 */
 .app-main {
-  background-color: #f5f7fa;
-  padding: 20px;
+  background-color: #ffffff;
+  padding: 24px;
   overflow-y: auto;
   height: 100%;
   position: relative;
+  border-radius: 8px;
+  margin: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
 /* 加载状态 */
@@ -274,9 +295,9 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(245, 247, 250, 0.9);
+  background-color: rgba(255, 255, 255, 0.95);
   z-index: 10;
-  padding: 20px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -295,11 +316,16 @@ onMounted(() => {
   }
 
   .app-header {
-    padding: 0 10px;
+    padding: 0 16px;
   }
 
   .app-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+  }
+
+  .app-main {
+    margin: 8px;
+    padding: 16px;
   }
 }
 </style>
