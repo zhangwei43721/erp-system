@@ -6,6 +6,7 @@ import AddSellJh from "@/views/AddSellJh.vue";
 import ListSellJh from "@/views/ListSellJh.vue";
 import ListCustOrder from "@/views/ListCustOrder.vue";
 import ListAfterSale from "@/views/ListAfterSale.vue";
+import AddMenus from "@/views/AddMenus.vue";
 
 // Vue核心
 import { computed, onMounted, ref, watch } from "vue";
@@ -27,6 +28,7 @@ const viewComponents = {
   listAfterSale: markRaw(ListAfterSale),
   listCustOrder: markRaw(ListCustOrder),
   addSellJh: markRaw(AddSellJh),
+  addMenus: markRaw(AddMenus),
   listSellJh: markRaw(ListSellJh)
 };
 
@@ -35,10 +37,12 @@ const views = [
   viewComponents.listCustomer,
   viewComponents.listAfterSale,
   viewComponents.listCustOrder,
-  viewComponents.addSellJh,
-  viewComponents.addSellJh,
-  viewComponents.addSellJh,
   viewComponents.listSellJh,
+  viewComponents.addSellJh,
+  viewComponents.addSellJh,
+  viewComponents.addSellJh,
+  viewComponents.addMenus,
+  viewComponents.addSellJh,
 ];
 
 const currentComponent = shallowRef(views[0]);
