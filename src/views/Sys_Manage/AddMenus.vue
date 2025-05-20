@@ -1,5 +1,5 @@
 <template>
-    <h2>添加菜单</h2>
+    <h2>管理菜单</h2>
     <div style="text-align: left">
       <h4>选择新增节点的父节点:</h4>
       <el-tree
@@ -26,7 +26,7 @@
     <hr/>
     <!-- 添加表单控件 -->
     <el-form :model="menuForm" label-width="120px">
-      <el-form-item label="菜单名称">
+      <el-form-item label="新增菜单名称">
         <el-input v-model="menuForm.label" style="width: 50%"/>
       </el-form-item>
       <el-form-item>

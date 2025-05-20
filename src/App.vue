@@ -1,12 +1,12 @@
 <script setup>
 // --- 模块导入 ---
-import AddCustomer from "@/views/AddCustomer.vue";
-import ListCustomer from "@/views/ListCustomer.vue";
-import AddSellJh from "@/views/AddSellJh.vue";
-import ListSellJh from "@/views/ListSellJh.vue";
-import ListCustOrder from "@/views/ListCustOrder.vue";
-import ListAfterSale from "@/views/ListAfterSale.vue";
-import AddMenus from "@/views/AddMenus.vue";
+import AddCustomer from "@/views/Custom_Manage/AddCustomer.vue";
+import ListCustomer from "@/views/Custom_Manage/ListCustomer.vue";
+import AddSellJh from "@/views/Custom_Manage/AddSellJh.vue";
+import ListSellJh from "@/views/Custom_Manage/ListSellJh.vue";
+import ListCustOrder from "@/views/Custom_Manage/ListCustOrder.vue";
+import ListAfterSale from "@/views/Custom_Manage/ListAfterSale.vue";
+import AddMenus from "@/views/Sys_Manage/AddMenus.vue";
 
 // Vue核心
 import { computed, onMounted, ref, watch } from "vue";
@@ -100,6 +100,8 @@ watch(error, (newError) => {
   }
 });
 
+// 定义默认展开的菜单项
+const defaultOpeneds = computed(() => menus.value.map(menu => menu.id.toString()));
 onMounted(() => {
   fetchMenus();
 });
@@ -142,7 +144,7 @@ onMounted(() => {
           <el-alert v-if="error && !hasMenus" :title="error" type="error" show-icon @close="error = null" />
 
           <!-- 菜单内容 -->
-          <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened>
+          <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened :default-openeds="defaultOpeneds">
             <el-sub-menu v-for="menu in menus" :key="menu.id" :index="menu.id.toString()">
               <template #title>
                 <el-icon><Folder /></el-icon>

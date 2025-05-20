@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import ListCustomer from '../views/ListCustomer.vue'
+import ListCustomer from '../views/Custom_Manage/ListCustomer.vue'
 
 const routes = [
   {
