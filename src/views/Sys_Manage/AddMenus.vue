@@ -197,8 +197,8 @@ const isPidOfLevelOneNode = (pidToCheck) => {
 
 const getNodeLevel = (node) => {
   if (!node || !node.data || typeof node.data.pid === 'undefined') return 0;
-  if (node.data.pid === 0) return 1;
-  if (node.data.pid !== 0 && isPidOfLevelOneNode(node.data.pid)) {
+  if (node.data.pid === 0) return 1; // 直接判断pid是否为0
+  if (node.data.pid !== 0 && isPidOfLevelOneNode(node.data.pid)) { // isPidOfLevelOneNode 遍历 treeNodeList
     return 2;
   }
   return 0; // 未知或无效层级
@@ -259,7 +259,6 @@ const allowDrop = (draggingNode, dropNode, type) => {
     if (dropLevel === 2) { // 目标也是二级节点
       if (type === 'inner') {
         // 严格禁止二级节点下面再有子节点 (防止三级)
-        // ElMessage.warning('子菜单不能再包含下级子菜单。');
         return false;
       }
       // 允许二级节点之间同级排序 (prev/next)
@@ -274,30 +273,46 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
   if (dropType === 'none') {
     return;
   }
-  // ElMessage.info(`节点 "${draggingNode.data.label}" 已拖拽到 "${dropNode.data.label}" ${dropType}`);
 
-  await nextTick();
-  const updates = [];
-  function collectUpdatesRecursive(nodes, parentId) {
-    nodes.forEach((node, index) => {
-      updates.push({
-        id: node.id,
+  // ElMessage.info(`节点 "${draggingNode.data.label}" 已拖拽到 "${dropNode.data.label}" ${dropType}`);
+  // Element Plus 的 el-tree 会在触发此事件前，在内部更新其数据模型 (treeNodeList.value 的结构)。
+  // 我们需要确保基于这个新结构，节点的 pid 也被正确更新。
+
+  await nextTick(); // 等待DOM和el-tree内部数据更新
+
+  // 重新构建树的PID和排序信息，并直接更新到 treeNodeList.value 中的节点
+  // 这一步至关重要，确保后续的 getNodeLevel 能获取到最新的 pid
+  const updateNodePidsAndCollectChanges = (nodes, parentId) => {
+    const changes = [];
+    nodes.forEach((nodeData, index) => {
+      // 直接更新前端数据中的 pid 和 sortOrder (如果需要)
+      nodeData.pid = parentId;
+      // nodeData.sortOrder = index; // 如果你的数据模型中有 sortOrder 并且你也想更新它
+
+      changes.push({
+        id: nodeData.id,
         pid: parentId,
         sortOrder: index,
-        label: node.label // 可选，如果label也会变动
+        label: nodeData.label
       });
-      if (node.subMenu && node.subMenu.length > 0) {
-        collectUpdatesRecursive(node.subMenu, node.id);
+
+      if (nodeData.subMenu && nodeData.subMenu.length > 0) {
+        // 递归调用，并将其子节点收集的变更合并
+        changes.push(...updateNodePidsAndCollectChanges(nodeData.subMenu, nodeData.id));
+      } else if (!nodeData.subMenu) {
+        // 确保空的父节点在拖拽后仍然有 subMenu: []
+        nodeData.subMenu = [];
       }
     });
-  }
+    return changes;
+  };
 
-  collectUpdatesRecursive(treeNodeList.value, 0); // 根节点的父ID为0
+  // 基于当前 treeNodeList.value (el-tree 拖拽后更新的结构) 来更新 PID 并收集变更
+  const updatesToSendToBackend = updateNodePidsAndCollectChanges(treeNodeList.value, 0);
 
-  if (updates.length > 0) {
-    // console.log('Sending updated menu structure to backend:', updates);
+  if (updatesToSendToBackend.length > 0) {
     try {
-      const response = await axios.post("http://localhost:8080/updateMenusOrder", updates);
+      const response = await axios.post("http://localhost:8080/updateMenusOrder", updatesToSendToBackend);
       if (response.data.code === 200) {
         ElMessage.success('菜单顺序已同步到后端');
         // 通常不需要刷新，因为 treeNodeList.value 已是最新。
