@@ -1,7 +1,7 @@
 <template>
   <h2>管理菜单</h2>
   <div style="text-align: left">
-    <h4>选择新增节点的父节点 (或拖拽排序):</h4>
+    <h4>选择新增节点的父节点（支持拖拽调整顺序）</h4>
     <el-tree
         :props="props"
         :data="treeNodeList"
@@ -56,306 +56,283 @@
 import { onMounted, reactive, ref, nextTick } from "vue";
 import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
-// 注意：移除了 Element Plus 拖拽事件相关的类型导入，因为在纯 JS 中它们不是必需的
-// import type Node from 'element-plus/es/components/tree/src/model/node'
-// import type { DragEvents } from 'element-plus/es/components/tree/src/model/useDragNode'
-// import type { AllowDropType, NodeDropType } from 'element-plus/es/components/tree/src/tree.type'
 
-// 定义tree控件的配置参数
 const props = {
-label: 'label',
-children: 'subMenu' // 这个与后端返回的 MenuVo 中的子菜单属性名一致
+  label: 'label',
+  children: 'subMenu'
 };
 
-// 定义tree控件节点的集合
 const treeNodeList = ref([]);
-const treeRef = ref(null); // 或 ref()
+const treeRef = ref(null);
 
-// 定义添加菜单的form表单
 const menuForm = reactive({
-id: null,
-label: '',
-component: null,
-pid: 0 // 新增时父节点ID，根节点 pid 为 0
+  id: null,
+  label: '',
+  component: null,
+  pid: 0
 });
 
-// 添加弹窗状态和编辑表单数据
 const dialogVisible = ref(false);
 const editForm = reactive({
-id: null,
-label: '',
-component: null
+  id: null,
+  label: '',
+  component: null
 });
 
-// 发送ajax请求，加载菜单节点树
 function loadMenuTree() {
-axios.get("http://localhost:8080/listMenus")
-  .then((response) => {
-    treeNodeList.value = response.data;
-  })
-  .catch((error) => {
-    console.log(error);
-    ElMessage.error("菜单加载失败");
-  });
+  axios.get("http://localhost:8080/listMenus")
+    .then((response) => {
+      treeNodeList.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      ElMessage.error("菜单加载失败");
+    });
 }
 
 onMounted(() => {
-loadMenuTree();
+  loadMenuTree();
 });
 
-// 声明变量保存当前选中树节点的id，用于新增
-let currentSelectedPidForAdd = 0; // 根节点 pid 为 0
+let currentSelectedPidForAdd = 0;
 
-// 定义tree控件节点的点击回调函数
-function hanldNodeClick(data) { // 移除了类型: MenuData
-currentSelectedPidForAdd = data.id;
-console.log("Selected parent for new node:", currentSelectedPidForAdd);
+function hanldNodeClick(data) {
+  currentSelectedPidForAdd = data.id;
+  // console.log("Selected parent for new node:", currentSelectedPidForAdd);
 }
 
-// 打开编辑弹窗
-function openEditDialog(data) { // 移除了类型: MenuData
-editForm.id = data.id;
-editForm.label = data.label;
-editForm.component = data.component;
-dialogVisible.value = true;
+function openEditDialog(data) {
+  editForm.id = data.id;
+  editForm.label = data.label;
+  editForm.component = data.component;
+  dialogVisible.value = true;
 }
 
-// 更新菜单
 function updateMenu() {
-axios.put("http://localhost:8080/updateMenus", editForm)
-  .then((response) => {
-    if (response.data.code === 200) {
-      loadMenuTree(); // 重新加载树
-      dialogVisible.value = false;
-    }
-    ElMessage({
-      type: response.data.code === 200 ? 'success' : 'error',
-      message: response.data.msg || (response.data.code === 200 ? '更新成功' : '更新失败')
+  axios.put("http://localhost:8080/updateMenus", editForm)
+    .then((response) => {
+      if (response.data.code === 200) {
+        loadMenuTree();
+        dialogVisible.value = false;
+      }
+      ElMessage({
+        type: response.data.code === 200 ? 'success' : 'error',
+        message: response.data.msg || (response.data.code === 200 ? '更新成功' : '更新失败')
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      ElMessage.error('修改失败，请稍后重试');
     });
-  })
-  .catch((error) => {
-    console.log(error);
-    ElMessage.error('修改失败，请稍后重试');
-  });
 }
 
-// 重置表单
 function resetForm() {
-menuForm.label = '';
-menuForm.component = null;
-currentSelectedPidForAdd = 0; // 重置为根节点
-if (treeRef.value) {
-  treeRef.value.setCurrentKey(null); // 取消选中高亮
-}
+  menuForm.label = '';
+  menuForm.component = null;
+  currentSelectedPidForAdd = 0;
+  if (treeRef.value) {
+    treeRef.value.setCurrentKey(null);
+  }
 }
 
-// 发送保存菜单的请求
 function subMenuForm() {
-if (!menuForm.label.trim()) {
+  if (!menuForm.label.trim()) {
     ElMessage.warning("菜单名称不能为空");
     return;
-}
-// currentSelectedPidForAdd 默认是 0，如果用户没点任何节点直接添加，则添加到根节点
-menuForm.pid = currentSelectedPidForAdd;
-axios.post("http://localhost:8080/saveMenus", menuForm)
-  .then((response) => {
-    if (response.data.code === 200) {
-      loadMenuTree();
-      resetForm();
-    }
-    ElMessage({
-      type: response.data.code === 200 ? 'success' : 'error',
-      message: response.data.msg || (response.data.code === 200 ? '添加成功' : '添加失败')
+  }
+  menuForm.pid = currentSelectedPidForAdd;
+  axios.post("http://localhost:8080/saveMenus", menuForm)
+    .then((response) => {
+      if (response.data.code === 200) {
+        loadMenuTree();
+        resetForm();
+      }
+      ElMessage({
+        type: response.data.code === 200 ? 'success' : 'error',
+        message: response.data.msg || (response.data.code === 200 ? '添加成功' : '添加失败')
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      ElMessage.error('添加失败，请稍后重试');
     });
-  })
-  .catch((error) => {
-    console.log(error);
-    ElMessage.error('添加失败，请稍后重试');
-  });
 }
 
-// 删除菜单
-async function delMenus(node, data) { // 移除了类型: Node, MenuData
-if (data.subMenu && data.subMenu.length > 0) {
-  ElMessage.warning(data.label + ", 节点存在子节点不能删除!");
-  return;
-}
-try {
-  await ElMessageBox.confirm(
-    `确定要删除菜单 "${data.label}" 吗?`,
-    '提示',
-    {
-      confirmButtonText: '确定',
-      cancelButtonText: '取消',
-      type: 'warning',
-    }
-  );
-  // 用户点击了确定
-  const response = await axios.delete("http://localhost:8080/deleteMenus?id=" + data.id);
-  if (response.data.code === 200) {
-    loadMenuTree(); // 重新加载树
+async function delMenus(node, data) {
+  if (data.subMenu && data.subMenu.length > 0) {
+    ElMessage.warning(data.label + ", 节点存在子节点不能删除!");
+    return;
   }
-  ElMessage({
-    type: response.data.code === 200 ? 'success' : 'error',
-    message: response.data.msg
-  });
-} catch (error) {
-  // 用户点击了取消，或者网络错误
-  if (error !== 'cancel' && error !== 'close') { // ElMessageBox.confirm取消时会reject 'cancel'
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除菜单 "${data.label}" 吗?`,
+      '提示',
+      { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }
+    );
+    const response = await axios.delete("http://localhost:8080/deleteMenus?id=" + data.id);
+    if (response.data.code === 200) {
+      loadMenuTree();
+    }
+    ElMessage({ type: response.data.code === 200 ? 'success' : 'error', message: response.data.msg });
+  } catch (error) {
+    if (error !== 'cancel' && error !== 'close') {
       console.error("删除失败:", error);
       ElMessage.error('删除操作失败');
-  } else {
+    } else {
       ElMessage.info('已取消删除');
+    }
   }
-}
 }
 
 // --- 拖拽相关方法 ---
+const allowDrag = (draggingNode) => {
+  return true;
+};
 
-const allowDrag = (draggingNode) => { // 移除了类型: Node
-// 可以根据需要限制某些节点不可拖拽
-// 例如: if (draggingNode.data.label === '不可拖拽的节点') return false;
-return true;
+// 辅助函数，用于getNodeLevel
+const isPidOfLevelOneNode = (pidToCheck) => {
+  if (!treeNodeList.value || treeNodeList.value.length === 0) return false;
+  return treeNodeList.value.some(levelOneNode => levelOneNode.id === pidToCheck);
+};
+
+const getNodeLevel = (node) => {
+  if (!node || !node.data || typeof node.data.pid === 'undefined') return 0;
+  if (node.data.pid === 0) return 1;
+  if (node.data.pid !== 0 && isPidOfLevelOneNode(node.data.pid)) {
+    return 2;
+  }
+  return 0; // 未知或无效层级
 };
 
 const allowDrop = (draggingNode, dropNode, type) => {
-  // 辅助函数：获取节点层级
-  const getNodeLevel = (node) => {
-    if (!node || !node.data) return 0; // 无效或未知层级，保守处理
-    if (node.data.pid === 0) return 1; // 一级菜单
-    // 判断是否为二级菜单：其父节点是一级菜单
-    // treeNodeList.value 是一级菜单的数组
-    // 需要遍历 treeNodeList 找到 node.parent.key 对应的一级菜单
-    // 或者更简单地，如果 node.data.pid 不为0，且其父节点存在且 pid 为 0
-    if (node.data.pid !== 0 && node.parent && node.parent.data && node.parent.data.pid === 0) {
-        return 2; // 二级菜单
-    }
-    return 0; // 其他情况视为未知或不合规层级
-  };
-
   const draggingLevel = getNodeLevel(draggingNode);
   const dropLevel = getNodeLevel(dropNode);
 
-  // console.log(`Dragging: ${draggingNode.data.label}(L${draggingLevel}, PID ${draggingNode.data.pid}), Drop: ${dropNode.data.label}(L${dropLevel}, PID ${dropNode.data.pid}), Type: ${type}`);
+  // 节点是否有子节点 (基于 draggingNode.data.subMenu，这依赖于后端返回的数据结构)
+  // 或者直接检查 draggingNode (Node对象) 的 childNodes
+  const draggingNodeHasChildren = draggingNode.childNodes && draggingNode.childNodes.length > 0;
 
-  // 规则0: 无效层级或拖拽自身，则不允许
+  // console.log(`D[${draggingNode.data.label} L${draggingLevel} HasChildren:${draggingNodeHasChildren}] O[${dropNode.data.label} L${dropLevel}] T[${type}]`);
+
+  // 基本校验：无效层级或拖拽自身
   if (draggingLevel === 0 || dropLevel === 0 || draggingNode.key === dropNode.key) {
     return false;
   }
 
-  // 规则 1: 拖拽的是一级节点 (Level 1)
+  // --- 规则开始 ---
+
+  // 规则1: 拖拽一级节点 (父节点)
   if (draggingLevel === 1) {
-    if (dropLevel === 1) {
-      // 目标也是一级节点: 只允许同级排序 (prev, next)
+    if (dropLevel === 1) { // 目标也是一级节点
       if (type === 'inner') {
-        // ElMessage.warning('一级菜单之间不能互相嵌套，只能同级排序。');
-        return false; // 严格禁止放入内部
+        // 条件：允许一级节点A放入一级节点B内部，前提是A没有子节点
+        // 此时A将从一级降为二级
+        if (draggingNodeHasChildren) {
+          // ElMessage.warning('有子节点的父菜单不能直接成为其他父菜单的子菜单。');
+          return false; // 有子节点的一级不能直接降级并带子节点进入 (避免三级)
+        }
+        return true; // 允许无子节点的一级节点成为另一一级节点的子节点
       }
-      return true; //允许 prev/next
-    } else { // dropLevel is 2 or other
-      // 不允许一级节点拖到二级节点或其他非一级节点的位置
-      // ElMessage.warning('一级菜单只能与其他一级菜单同级排序。');
-      return false;
+      return true; // 允许一级节点之间同级排序 (prev/next)
+    }
+    if (dropLevel === 2) { // 目标是二级节点
+        // 通常不允许一级节点直接操作二级节点来改变层级或排序，除非特定场景
+        // 例如：如果想把一级节点P1放到二级节点S1的父节点下，与S1同级，
+        // 这种情况应该通过拖拽P1到S1的父节点P2的 prev/next/inner 来实现。
+        // 这里先保守禁止，一级节点不能直接以二级节点为目标改变结构。
+        return false;
     }
   }
 
-  // 规则 2: 拖拽的是二级节点 (Level 2)
+  // 规则2: 拖拽二级节点 (子节点)
   if (draggingLevel === 2) {
-    if (dropLevel === 1) {
-      // 目标是一级节点: 只允许放入内部 (inner)
+    if (dropLevel === 1) { // 目标是一级节点 (父节点)
+      // 二级节点可以拖入一级节点内部成为其子节点 (type === 'inner')
+      // 二级节点也可以拖到一级节点的前后，实现升级为新的一级节点
       if (type === 'prev' || type === 'next') {
-        // ElMessage.warning('二级菜单不能与一级菜单同级，请拖入一级菜单内部。');
-        return false;
+          // 允许二级节点升级为一级节点，与目标一级节点同级
+          return true;
       }
-      return true; // 允许 inner
-    } else if (dropLevel === 2) {
-      // 目标也是二级节点: 只允许同级排序 (prev, next)，不允许放入内部
+      // type === 'inner'，成为其子节点
+      return true;
+    }
+    if (dropLevel === 2) { // 目标也是二级节点
       if (type === 'inner') {
-        // ElMessage.warning('二级菜单不能再包含子菜单。');
+        // 严格禁止二级节点下面再有子节点 (防止三级)
+        // ElMessage.warning('子菜单不能再包含下级子菜单。');
         return false;
       }
-      return true; // 允许 prev/next (同父或跨父的同级排序)
-    } else { // dropLevel is other
-        return false; // 不允许二级节点拖到其他未知层级
+      // 允许二级节点之间同级排序 (prev/next)
+      return true;
     }
   }
 
-  return false; // 默认不通过，以防有未覆盖的逻辑
+  return false; // 其他未明确定义的拖拽均不允许
 };
 
 const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
-// 移除了参数类型: Node, Node, NodeDropType, DragEvents
-if (dropType === 'none') {
-  // 没有实际放置，不处理
-  return;
-}
-
-ElMessage.info(`节点 "${draggingNode.data.label}" 已拖拽到 "${dropNode.data.label}" ${dropType === 'inner' ? '内部' : (dropType === 'before' ? '前面' : '后面')}`);
-
-await nextTick();
-
-const updates = [];
-
-function collectUpdatesRecursive(nodes, parentId) { // 移除了 nodes 类型 MenuData[]
-  nodes.forEach((node, index) => {
-    updates.push({
-      id: node.id,
-      pid: parentId,
-      sortOrder: index,
-      label: node.label
-    });
-    if (node.subMenu && node.subMenu.length > 0) {
-      collectUpdatesRecursive(node.subMenu, node.id);
-    }
-  });
-}
-
-collectUpdatesRecursive(treeNodeList.value, 0); // 假设根节点的 pid 为 0
-
-if (updates.length > 0) {
-  console.log('Sending updated menu structure to backend:', updates);
-  try {
-    const response = await axios.post("http://localhost:8080/updateMenusOrder", updates);
-    if (response.data.code === 200) {
-      ElMessage.success('菜单顺序已同步到后端');
-      // 拖拽成功后，通常不需要 loadMenuTree()，因为前端 treeNodeList.value 已是最新。
-      // loadMenuTree(); // 如果需要强制从后端同步
-    } else {
-      ElMessage.error(response.data.msg || '后端同步失败');
-      loadMenuTree(); // 同步失败，最好从后端恢复数据
-    }
-  } catch (error) {
-    console.error("Error updating menu order:", error);
-    ElMessage.error('同步菜单顺序失败，请稍后重试');
-    loadMenuTree(); // 网络错误等，也从后端恢复数据
+  if (dropType === 'none') {
+    return;
   }
-}
-};
+  // ElMessage.info(`节点 "${draggingNode.data.label}" 已拖拽到 "${dropNode.data.label}" ${dropType}`);
 
+  await nextTick();
+  const updates = [];
+  function collectUpdatesRecursive(nodes, parentId) {
+    nodes.forEach((node, index) => {
+      updates.push({
+        id: node.id,
+        pid: parentId,
+        sortOrder: index,
+        label: node.label // 可选，如果label也会变动
+      });
+      if (node.subMenu && node.subMenu.length > 0) {
+        collectUpdatesRecursive(node.subMenu, node.id);
+      }
+    });
+  }
+
+  collectUpdatesRecursive(treeNodeList.value, 0); // 根节点的父ID为0
+
+  if (updates.length > 0) {
+    // console.log('Sending updated menu structure to backend:', updates);
+    try {
+      const response = await axios.post("http://localhost:8080/updateMenusOrder", updates);
+      if (response.data.code === 200) {
+        ElMessage.success('菜单顺序已同步到后端');
+        // 通常不需要刷新，因为 treeNodeList.value 已是最新。
+        // 若后端有其他副作用或为了绝对保险，可以取消注释下一行
+        // loadMenuTree();
+      } else {
+        ElMessage.error(response.data.msg || '后端同步失败，正在还原...');
+        loadMenuTree(); // 同步失败，从后端恢复
+      }
+    } catch (error) {
+      console.error("Error updating menu order:", error);
+      ElMessage.error('同步菜单顺序失败，正在还原...');
+      loadMenuTree(); // 网络错误等，也从后端恢复
+    }
+  }
+};
 </script>
 
 <style scoped>
 ::v-deep .el-tree-node.is-current > .el-tree-node__content {
-background-color: var(--el-color-primary-light-9);
-color: var(--el-color-primary);
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
 }
-
 ::v-deep .el-tree-node__content:hover {
-background-color: var(--el-fill-color-light);
+  background-color: var(--el-fill-color-light);
 }
-
 ::v-deep .el-tree {
---el-tree-node-hover-bg-color: var(--el-fill-color-light);
---el-tree-text-color: var(--el-text-color-regular);
---el-tree-expand-icon-color: var(--el-text-color-placeholder);
+  --el-tree-node-hover-bg-color: var(--el-fill-color-light);
 }
-
 .custom-tree-node {
-flex: 1;
-display: flex;
-align-items: center;
-justify-content: space-between;
-font-size: 14px;
-padding-right: 8px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
 }
 </style>
