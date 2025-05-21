@@ -36,6 +36,7 @@
     <el-form-item>
       <el-button type="primary" @click="subMenuForm">保存</el-button>
       <el-button @click="resetForm">取消</el-button>
+      <el-button @click="clearTreeSelection" style="margin-left: 10px;">取消当前选中节点</el-button>
     </el-form-item>
   </el-form>
   <!-- 修改弹窗 -->
@@ -133,6 +134,14 @@ function resetForm() {
   if (treeRef.value) {
     treeRef.value.setCurrentKey(null);
   }
+}
+// --- 取消树节点选中 ---
+function clearTreeSelection() {
+  if (treeRef.value) {
+    treeRef.value.setCurrentKey(null); // 取消 Element Plus Tree 的当前高亮节点
+  }
+  currentSelectedPidForAdd = 0; // 重置用于添加新节点的父节点ID
+  ElMessage.info('已取消节点选择'); // 可选：给用户一个反馈
 }
 
 function subMenuForm() {
