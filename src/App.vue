@@ -140,7 +140,7 @@ onBeforeUnmount(() => {
       <!-- 顶部Header区域 -->
       <el-header class="app-header">
         <div class="header-content">
-          <el-icon class="header-icon"><HomeFilled /></el-icon>
+          <el-icon class="header-icon"><component :is="ElementPlusIconsVue.HomeFilled" /></el-icon>
           <h1 class="app-title">ERP管理系统</h1>
           <span class="app-subtitle">ikun小组</span>
         </div>
@@ -150,7 +150,7 @@ onBeforeUnmount(() => {
         <!-- 左侧Aside区域 (导航菜单) -->
         <el-aside width="240px" class="app-sidebar">
           <div class="menu-header">
-            <el-icon><MenuIcon /></el-icon>
+            <el-icon><component :is="ElementPlusIconsVue.Menu" /></el-icon>
             系统菜单
           </div>
 
