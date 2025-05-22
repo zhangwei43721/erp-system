@@ -23,6 +23,7 @@
         <span>操作</span>
       </template>
       <template #default="scope">
+        <el-button size="mini" @click="handleAuthorize(scope.row)">授权</el-button>
         <el-button v-if="!scope.row.edit" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
         <el-button v-else size="mini" type="success" @click="handleSave(scope.row)">保存</el-button>
         <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
@@ -46,14 +47,37 @@
       <el-form-item label="角色描述">
         <el-input v-model="rolerForm.rdesc" style="width: 80%" />
       </el-form-item>
-
-
       <el-form-item>
         <el-button type="primary" @click="saveRoleForm">保存</el-button>
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
 
+  </el-dialog>
+  <!--授权对话框-->
+  <el-dialog title="角色授权" v-model="authDialogVisible" width="40%">
+    <div style="text-align: left">
+      <h4>请选择该角色可访问的菜单</h4>
+      <el-tree
+        :props="props"
+        :data="treeNodeList"
+        node-key="id"
+        show-checkbox
+        default-expand-all
+        ref="treeRef"
+        :highlight-current="true"
+      >
+        <template #default="{ node, data }">
+          <span class="custom-tree-node">
+            <span>{{ node.label }}</span>
+          </span>
+        </template>
+      </el-tree>
+    </div>
+    <template #footer>
+      <el-button @click="authDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="saveRoleAuth">保存授权</el-button>
+    </template>
   </el-dialog>
 
 </template>
@@ -65,6 +89,20 @@ import { ElMessage, ElMessageBox } from "element-plus";
 //定义角色集合列表数据
 const rolerList = ref([]);
 const total = ref(0);
+
+// 树形菜单相关数据
+const treeNodeList = ref([]);
+const treeRef = ref(null);
+const props = {
+  label: 'label',
+  children: 'subMenu'
+};
+
+// 授权对话框状态
+const authDialogVisible = ref(false);
+const currentRoleId = ref(null);
+const currentRoleName = ref('');
+
 //发送请求加载角色列表
 function queryRoleList(pageNum) {
   axios.get("http://localhost:8080/rolerList?pageNum=" + pageNum)
@@ -103,6 +141,113 @@ function handleSave(row) {
     })
     .catch((error) => {
       console.log(error);
+    });
+}
+
+// 处理授权按钮点击事件
+function handleAuthorize(row) {
+  currentRoleId.value = row.id;
+  currentRoleName.value = row.rname;
+  loadMenuTree();
+  loadRoleMenus(row.id);
+  authDialogVisible.value = true;
+}
+
+// 加载菜单树
+function loadMenuTree() {
+  axios.get("http://localhost:8080/listMenus")
+    .then((response) => {
+      treeNodeList.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+      ElMessage.error("菜单加载失败");
+    });
+}
+
+// 加载角色已有的菜单权限
+function loadRoleMenus(roleId) {
+  axios.get(`http://localhost:8080/listRoleMenus?roleId=${roleId}`)
+    .then((response) => {
+      // 等待树加载完成后再设置选中状态
+      setTimeout(() => {
+        if (treeRef.value) {
+          // 清除之前的选择
+          treeRef.value.setCheckedKeys([]);
+          
+          // 设置新的选中项
+          if (response.data && response.data.length > 0) {
+            // 先找出只包含叶子节点的ID
+            const leafNodeIds = filterLeafNodeIds(response.data, treeNodeList.value);
+            // 只选中叶子节点，父节点会自动变为半选中状态
+            treeRef.value.setCheckedKeys(leafNodeIds);
+          }
+        }
+      }, 100);
+    })
+    .catch((error) => {
+      console.log(error);
+      ElMessage.error("角色菜单权限加载失败");
+    });
+}
+
+// 递归检查节点ID是否为叶子节点，并过滤出叶子节点ID
+function filterLeafNodeIds(ids, nodes) {
+  // 存储所有非叶子节点的ID
+  const parentIds = new Set();
+  
+  // 递归收集所有非叶子节点ID
+  function collectParentIds(nodeList) {
+    if (!nodeList || nodeList.length === 0) return;
+    
+    for (const node of nodeList) {
+      if (node.subMenu && node.subMenu.length > 0) {
+        // 这是一个父节点
+        parentIds.add(node.id);
+        // 递归检查子节点
+        collectParentIds(node.subMenu);
+      }
+    }
+  }
+  
+  // 收集所有父节点ID
+  collectParentIds(nodes);
+  
+  // 过滤出只有叶子节点的ID
+  return ids.filter(id => !parentIds.has(id));
+}
+
+// 保存角色授权
+function saveRoleAuth() {
+  if (!treeRef.value || !currentRoleId.value) {
+    ElMessage.warning("请先选择角色和菜单");
+    return;
+  }
+  
+  // 获取选中的节点和半选中的节点
+  const checkedKeys = treeRef.value.getCheckedKeys();
+  const halfCheckedKeys = treeRef.value.getHalfCheckedKeys();
+  
+  // 合并所有需要的权限ID
+  const allKeys = [...checkedKeys, ...halfCheckedKeys];
+  
+  const authData = {
+    roleId: currentRoleId.value,
+    menuIds: allKeys
+  };
+  
+  axios.post("http://localhost:8080/saveRoleMenus", authData)
+    .then((response) => {
+      if (response.data.code === 200) {
+        ElMessage.success("授权成功");
+        authDialogVisible.value = false;
+      } else {
+        ElMessage.error(response.data.msg || "授权失败");
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      ElMessage.error("授权失败，请稍后重试");
     });
 }
 
@@ -158,4 +303,23 @@ function saveRoleForm() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+::v-deep .el-tree-node.is-current > .el-tree-node__content {
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+}
+::v-deep .el-tree-node__content:hover {
+  background-color: var(--el-fill-color-light);
+}
+::v-deep .el-tree {
+  --el-tree-node-hover-bg-color: var(--el-fill-color-light);
+}
+.custom-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
+}
+</style>
