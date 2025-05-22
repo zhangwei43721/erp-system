@@ -118,8 +118,8 @@
 
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import axios from "axios";
 import { ElMessage } from "element-plus";
+import { customerApi } from "@/api/customer";
 //数据库总记录数
 const total = ref(0)
 //声明投诉列表集合
@@ -134,7 +134,7 @@ const condForm = reactive({
 //定义函数发生ajax请求
 function queryAfterSaleList(pageNum) {
   condForm.pageNum = pageNum;
-  axios.post("http://localhost:8080/listAfterSale", condForm)
+  customerApi.getAfterSaleList(condForm)
     .then((response) => {
       afterSaleList.value = response.data.afterSalesList;
       total.value = response.data.total;
@@ -170,7 +170,7 @@ function openReplayDialog(qid) {
 //发送ajax请求
 function subReplayForm() {
   //发送aajx请求
-  axios.post("http://localhost:8080/saveReplay", replayForm)
+  customerApi.saveReply(replayForm)
     .then((response) => {
       if (response.data.code == 200) {
         dialogReplayVisible.value = false;
@@ -204,7 +204,7 @@ function loadQuestionReplayList(row) {
   question.quesDesc = row.question;
   qid = row.id;
   //发送ajax请求
-  axios.get("http://localhost:8080/listReplay?id=" + row.id)
+  customerApi.getReplyList(row.id)
     .then((response) => {
       replaysList.value = response.data.replayList;
       totalReplay.value = response.data.total;
@@ -217,7 +217,7 @@ function loadQuestionReplayList(row) {
 //提交分页查询参数的请求
 function handlerReplayPageChange(pageNum) {
   //发送ajax请求
-  axios.get("http://localhost:8080/listReplay?id=" + qid + "&pageNum=" + pageNum)
+  customerApi.getReplyList(qid, pageNum)
     .then((response) => {
       replaysList.value = response.data.replayList;
       totalReplay.value = response.data.total;

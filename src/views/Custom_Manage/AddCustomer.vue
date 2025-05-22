@@ -1,7 +1,7 @@
 <script setup>
 // --- 模块导入 ---
 import { reactive } from 'vue'; // reactive: 用于创建响应式对象
-import axios from 'axios';        // axios: 用于发送HTTP请求
+import { customerApi } from '@/api/customer';
 
 // --- 响应式状态定义 ---
 // 初始化响应式表单数据对象 (custForm)
@@ -16,8 +16,8 @@ const custForm = reactive({
 // --- 方法定义 ---
 // 声明提交表单的函数 (subCustForm)
 function subCustForm() {
-  // 使用axios发送POST请求到后端API '/saveCust'，请求体为custForm对象
-  axios.post("http://localhost:8080/saveCust", custForm)
+  // 使用customerApi发送保存客户请求
+  customerApi.saveCustomer(custForm)
     .then((response) => { // 请求成功的回调
       console.log(response.data); // 打印后端返回的数据
       // 提交成功后，清空表单各项数据

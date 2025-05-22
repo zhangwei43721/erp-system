@@ -55,8 +55,9 @@
 
 <script setup>
 import {onMounted, reactive, ref} from "vue";
-import axios from "axios";
 import {ElMessage} from "element-plus";
+import { sellPlanApi } from '@/api/sellPlan';
+import { customerApi } from '@/api/customer';
 //定义销售过程表单
 const sellForm=reactive({
   custid:'',      // 存储选中的客户ID
@@ -70,7 +71,7 @@ const custList=ref([]);
 
 //页面挂载时执行: 发送ajax请求，查询所有客户信息，用于填充客户名称的下拉列表框
 onMounted(function(){
-    axios.get("http://localhost:8080/listAllCust") // API端点，获取所有客户列表
+    customerApi.getAllCustomers() // API端点，获取所有客户列表
     .then((response)=>{
         custList.value=response.data; // 将获取的客户数据赋值给custList
     })
@@ -80,7 +81,7 @@ onMounted(function(){
 });
 
 function subSellForm() {
-  axios.post("http://localhost:8080/saveSellJh", sellForm)
+  sellPlanApi.saveSellPlan(sellForm)
     .then((response) => {
       // 检查后端返回的业务状态码，确保操作成功
       if (response.data.code === 200) {

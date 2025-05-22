@@ -84,8 +84,8 @@
 
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { roleApi } from "@/api/role";
 //定义角色集合列表数据
 const rolerList = ref([]);
 const total = ref(0);
@@ -105,7 +105,7 @@ const currentRoleName = ref('');
 
 //发送请求加载角色列表
 function queryRoleList(pageNum) {
-  axios.get("http://localhost:8080/rolerList?pageNum=" + pageNum)
+  roleApi.getRoleList(pageNum)
     .then((response) => {
       rolerList.value = response.data.rolerList;
       total.value = response.data.total;
@@ -129,10 +129,8 @@ function handleEdit(row) {
 }
 //定义函数实现编辑后保存
 function handleSave(row) {
-  //row.edit=false;
-  //console.log(row);
   //发送ajax请求进行数据更新
-  axios.post("http://localhost:8080/updateRoler", row)
+  roleApi.updateRole(row)
     .then((response) => {
       if (response.data.code == 200) {
         row.edit = false;
@@ -155,7 +153,7 @@ function handleAuthorize(row) {
 
 // 加载菜单树
 function loadMenuTree() {
-  axios.get("http://localhost:8080/listMenus")
+  roleApi.getMenuTree()
     .then((response) => {
       treeNodeList.value = response.data;
     })
@@ -167,7 +165,7 @@ function loadMenuTree() {
 
 // 加载角色已有的菜单权限
 function loadRoleMenus(roleId) {
-  axios.get(`http://localhost:8080/listRoleMenus?roleId=${roleId}`)
+  roleApi.getRoleMenus(roleId)
     .then((response) => {
       // 等待树加载完成后再设置选中状态
       setTimeout(() => {
@@ -229,7 +227,7 @@ function saveRoleAuth() {
     arr.push(item.id);
   });
   
-  axios.post("http://localhost:8080/grantRoleMenus", arr)
+  roleApi.grantRoleMenus(arr)
     .then((response) => {
       if (response.data.code === 200) {
         ElMessage.success("授权成功");
@@ -251,7 +249,7 @@ function handleDelete(row) {
     cancelButtonText: '取消',
     type: 'warning',
   }).then(() => {
-    axios.post("http://localhost:8080/deleteRoler", row)
+    roleApi.deleteRole(row)
       .then((response) => {
         if (response.data.code == 200) {
           queryRoleList(1);
@@ -280,7 +278,7 @@ function openRoleDialog() {
 }
 //定义函数提交角色信息保存的ajax请求
 function saveRoleForm() {
-  axios.post("http://localhost:8080/saveRoler", rolerForm)
+  roleApi.saveRole(rolerForm)
     .then((response) => {
       if (response.data.code == 200) {
         dialogRoleVisible.value = false;

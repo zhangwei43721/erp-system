@@ -73,10 +73,10 @@
 
 <!-- 5. Script区域 (Vue 3 Composition API setup语法糖) -->
 <script setup>
-// 导入Vue核心API, Axios HTTP库, Element Plus组件
+// 导入Vue核心API  Element Plus组件
 import { onMounted, ref, reactive } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { customerApi } from "@/api/customer";
 
 // --- 响应式状态定义 ---
 const custList = ref([]);          // 客户列表数据
@@ -107,8 +107,7 @@ const rules = {
 // --- 方法定义 ---
 // 查询客户列表 (pageNum: 请求的页码)
 function custListQeury(pageNum) {
-  // 使用 axios 发送 GET 请求到后端 API
-  axios.get(`http://localhost:8080/listCust?pageNum=${pageNum}`)
+  customerApi.getCustomerList(pageNum)
     .then((response) => { // 请求成功的回调
       custList.value = response.data.custlist; // 更新客户列表数据
       total.value = response.data.total;       // 更新总记录数
@@ -127,7 +126,7 @@ function deleteCustomer(id) {
     type: "warning",
   })
     .then(() => {
-      axios.delete(`http://localhost:8080/deleteCust/${id}`)
+      customerApi.deleteCustomer(id)
         .then(() => {
           ElMessage.success("删除成功");
           custListQeury(1); // 刷新列表
@@ -161,7 +160,7 @@ function openCustDialog(row) {
 function subCustForm() {
   custFormRef.value.validate(valid => { // 调用表单验证
     if (valid) {
-      axios.put("http://localhost:8080/updateCust", custForm)
+      customerApi.updateCustomer(custForm) // 调用API更新客户信息
         .then(() => {
           ElMessage.success("修改成功");
           dialogCustVisible.value = false;//关闭弹窗

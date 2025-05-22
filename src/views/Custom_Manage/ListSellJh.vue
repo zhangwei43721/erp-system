@@ -85,8 +85,9 @@
 
 <script setup>
 import { onMounted, ref, reactive } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { sellPlanApi } from '@/api/sellPlan';
+import { customerApi } from '@/api/customer';
 
 const sellJHList = ref([]);
 const total = ref(0);
@@ -144,8 +145,7 @@ function getChannelName(channelId) {
 }
 
 function sellJhListQuery(pageNum) {
-  axios
-    .get(`http://localhost:8080/sellJhList?pageNum=${pageNum}`)
+  sellPlanApi.getSellPlanList(pageNum)
     .then((response) => {
       sellJHList.value = response.data.sellJhList;
       total.value = response.data.total;
@@ -163,8 +163,7 @@ function deleteSellJh(id) {
     type: "warning",
   })
     .then(() => {
-      axios
-        .delete(`http://localhost:8080/deleteSellJh/${id}`)
+      sellPlanApi.deleteSellPlan(id)
         .then(() => {
           ElMessage.success("删除成功");
           sellJhListQuery(1);
@@ -181,8 +180,7 @@ function deleteSellJh(id) {
 
 function openSellJhDialog(row) {
   dialogSellJhVisible.value = true;
-  axios
-    .get("http://localhost:8080/listAllCust")
+  customerApi.getAllCustomers()
     .then((response) => {
       custList.value = response.data;
       Object.assign(sellJhForm, {
@@ -203,8 +201,7 @@ function openSellJhDialog(row) {
 function subSellJhForm() {
   sellJhFormRef.value.validate((valid) => {
     if (valid) {
-      axios
-        .put("http://localhost:8080/updateSellJh", sellJhForm)
+      sellPlanApi.updateSellPlan(sellJhForm)
         .then(() => {
           ElMessage.success("修改成功");
           dialogSellJhVisible.value = false;

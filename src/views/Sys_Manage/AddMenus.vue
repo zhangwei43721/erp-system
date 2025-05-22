@@ -55,9 +55,9 @@
 
 <script setup>
 import { onMounted, reactive, ref, nextTick } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
 import emitter from "@/eventBus";
+import { menuApi } from "@/api/menu";
 
 const props = {
   label: 'label',
@@ -82,7 +82,7 @@ const editForm = reactive({
 });
 
 function loadMenuTree() {
-  axios.get("http://localhost:8080/listMenus")
+  menuApi.getMenuTree()
     .then((response) => {
       treeNodeList.value = response.data;
     })
@@ -111,7 +111,7 @@ function openEditDialog(data) {
 }
 
 function updateMenu() {
-  axios.put("http://localhost:8080/updateMenus", editForm)
+  menuApi.updateMenu(editForm)
     .then((response) => {
       if (response.data.code === 200) {
         loadMenuTree();
@@ -152,7 +152,7 @@ function subMenuForm() {
     return;
   }
   menuForm.pid = currentSelectedPidForAdd;
-  axios.post("http://localhost:8080/saveMenus", menuForm)
+  menuApi.saveMenu(menuForm)
     .then((response) => {
       if (response.data.code === 200) {
         loadMenuTree();
@@ -181,7 +181,7 @@ async function delMenus(node, data) {
       '提示',
       { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }
     );
-    const response = await axios.delete("http://localhost:8080/deleteMenus?id=" + data.id);
+    const response = await menuApi.deleteMenu(data.id);
     if (response.data.code === 200) {
       loadMenuTree();
       emitter.emit('menu-structure-changed'); // <--- 触发事件
@@ -321,7 +321,7 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
 
   if (updatesToSendToBackend.length > 0) {
     try {
-      const response = await axios.post("http://localhost:8080/updateMenusOrder", updatesToSendToBackend);
+      const response = await menuApi.updateMenuOrder(updatesToSendToBackend);
       if (response.data.code === 200) {
         ElMessage.success('菜单顺序已同步到后端');
         emitter.emit('menu-structure-changed'); // <--- 触发事件

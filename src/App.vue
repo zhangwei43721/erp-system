@@ -14,14 +14,11 @@ import emitter from "@/eventBus";
 import { computed, onMounted, ref, watch, onBeforeUnmount } from "vue";
 import { markRaw, shallowRef } from "vue";
 
-// HTTP客户端
-import axios from "axios";
-
 // Element Plus 图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
-// API基础URL
-const API_BASE_URL = 'http://localhost:8080';
+// API 服务
+import { appApi } from '@/api/app';
 
 // --- 组件映射与状态定义 ---
 const viewComponents = {
@@ -71,10 +68,7 @@ const getIcon = (iconName) => {
 const handlerSelect = async (index) => {
   try {
     error.value = null;
-    const response = await axios.get(`${API_BASE_URL}/compIndex`, {
-      params: { id: index },
-      timeout: 5000
-    });
+    const response = await appApi.getComponentIndex(index);
     const compIndex = response.data;
     if (compIndex >= 0 && compIndex < views.length) {
       currentComponentIndex.value = compIndex;
@@ -93,9 +87,7 @@ const fetchMenus = async () => {
   try {
     isLoading.value = true;
     error.value = null;
-    const response = await axios.get(`${API_BASE_URL}/listMenus`, {
-      timeout: 5000
-    });
+    const response = await appApi.getMenus();
     menus.value = response.data;
     isLoading.value = false;
   } catch (err) {

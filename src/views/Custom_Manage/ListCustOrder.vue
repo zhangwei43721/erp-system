@@ -95,8 +95,8 @@
 
 <script setup>
 import { onMounted, ref, reactive } from "vue";
-import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { orderApi } from '@/api/order';
 
 // 定义订单列表
 const orderList = ref([]);
@@ -118,9 +118,7 @@ const orderForm = reactive({
 // 加载订单列表
 function loadOrderList(pageNum) {
   condForm.pageNum=pageNum;
-  axios
-    // .get(`http://localhost:8080/listOrder?pageNum=${pageNum}`)
-    .post("http://localhost:8080/listOrder", condForm)
+  orderApi.getOrderList(condForm)
     .then((response) => {
       orderList.value = response.data.orderList;
       total.value = response.data.total;
@@ -140,7 +138,7 @@ const condForm=reactive({
 //定义函数提交动态查询条件
 function subQueryCond(){
   condForm.pageNum=1; //将原来页码重置为1
-  axios.post("http://localhost:8080/listOrder",condForm)
+  orderApi.getOrderList(condForm)
       .then((response)=>{
         orderList.value=response.data.orderList;
         total.value=response.data.total;
@@ -157,8 +155,7 @@ function deleteOrder(id) {
     type: "warning",
   })
     .then(() => {
-      axios
-        .delete(`http://localhost:8080/deleteOrder/${id}`)
+      orderApi.deleteOrder(id)
         .then(() => {
           ElMessage.success("删除成功");
           loadOrderList(1);
@@ -190,8 +187,7 @@ function openOrderDialog(row) {
 
 // 保存修改
 function saveOrder() {
-  axios
-    .put("http://localhost:8080/updateOrder", orderForm)
+  orderApi.updateOrder(orderForm)
     .then(() => {
       ElMessage.success("修改成功");
       dialogOrderVisible.value = false;
