@@ -54,7 +54,7 @@
   <el-pagination
     small
     background
-    :page-size="3"
+    :page-size="10"
     :pager-count="10"
     layout="prev, pager, next"
     :total="total"

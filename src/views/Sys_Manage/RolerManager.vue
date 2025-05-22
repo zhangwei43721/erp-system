@@ -31,7 +31,7 @@
   </el-table>
   <!-- 分页组件 -->
   <hr />
-  <el-pagination small background :page-size="3" :pager-count="10" layout="prev, pager, next" :total="total"
+  <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="total"
     class="mt-4" @current-change="rolerPageChange" />
   <!-- 角色信息对话框 -->
   <!-- 回显客户信息的对话框 -->
@@ -148,6 +148,7 @@ function saveRoleForm() {
         dialogRoleVisible.value = false;
         rolerForm.rname = '';
         rolerForm.rdesc = '';
+        queryRoleList(1);
       }
       ElMessage(response.data.msg);
     })

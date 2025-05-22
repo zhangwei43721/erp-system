@@ -55,7 +55,7 @@
   </el-table>
   <hr />
 
-  <el-pagination small background :page-size="3" :pager-count="10" layout="prev, pager, next" :total="total"
+  <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="total"
     class="mt-4" @current-change="handlerSalePageChange" />
 
   <!-- 添加对话框控件 -->
@@ -94,10 +94,10 @@
         <!--        <el-table-column fixed="right" label="操作" width="200">
           <template #default="scope">
             <el-button link type="primary" size="small"
-                       @click="openReplayDialog(scope.row.id)">处理
+                      @click="openReplayDialog(scope.row.id)">处理
             </el-button>
             <el-button link type="primary" size="small"
-                       @click="loadQuestionReplayList(scope.row)">查看处理详情
+                      @click="loadQuestionReplayList(scope.row)">查看处理详情
             </el-button>
           </template>
         </el-table-column>-->
@@ -107,7 +107,7 @@
       <!--   分页    -->
       <hr />
 
-      <el-pagination small background :page-size="3" :pager-count="10" layout="prev, pager, next" :total="totalReplay"
+      <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="totalReplay"
         class="mt-4" @current-change="handlerReplayPageChange" />
 
     </div>
