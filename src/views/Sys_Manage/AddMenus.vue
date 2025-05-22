@@ -10,7 +10,7 @@
         :expand-on-click-node="false"
         ref="treeRef"
         @node-click="hanldNodeClick"
-        highlight-current="true"
+        :highlight-current="true"
         draggable
         :allow-drop="allowDrop"
         :allow-drag="allowDrag"
@@ -57,6 +57,7 @@
 import { onMounted, reactive, ref, nextTick } from "vue";
 import axios from "axios";
 import { ElMessage, ElMessageBox } from "element-plus";
+import emitter from "@/eventBus";
 
 const props = {
   label: 'label',
@@ -115,6 +116,7 @@ function updateMenu() {
       if (response.data.code === 200) {
         loadMenuTree();
         dialogVisible.value = false;
+        emitter.emit('menu-structure-changed'); // <--- 触发事件
       }
       ElMessage({
         type: response.data.code === 200 ? 'success' : 'error',
@@ -155,6 +157,7 @@ function subMenuForm() {
       if (response.data.code === 200) {
         loadMenuTree();
         resetForm();
+        emitter.emit('menu-structure-changed'); // <--- 触发事件
       }
       ElMessage({
         type: response.data.code === 200 ? 'success' : 'error',
@@ -181,6 +184,7 @@ async function delMenus(node, data) {
     const response = await axios.delete("http://localhost:8080/deleteMenus?id=" + data.id);
     if (response.data.code === 200) {
       loadMenuTree();
+      emitter.emit('menu-structure-changed'); // <--- 触发事件
     }
     ElMessage({ type: response.data.code === 200 ? 'success' : 'error', message: response.data.msg });
   } catch (error) {
@@ -220,9 +224,6 @@ const allowDrop = (draggingNode, dropNode, type) => {
   // 节点是否有子节点 (基于 draggingNode.data.subMenu，这依赖于后端返回的数据结构)
   // 或者直接检查 draggingNode (Node对象) 的 childNodes
   const draggingNodeHasChildren = draggingNode.childNodes && draggingNode.childNodes.length > 0;
-
-  // console.log(`D[${draggingNode.data.label} L${draggingLevel} HasChildren:${draggingNodeHasChildren}] O[${dropNode.data.label} L${dropLevel}] T[${type}]`);
-
   // 基本校验：无效层级或拖拽自身
   if (draggingLevel === 0 || dropLevel === 0 || draggingNode.key === dropNode.key) {
     return false;
@@ -296,7 +297,6 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
     nodes.forEach((nodeData, index) => {
       // 直接更新前端数据中的 pid 和 sortOrder (如果需要)
       nodeData.pid = parentId;
-      // nodeData.sortOrder = index; // 如果你的数据模型中有 sortOrder 并且你也想更新它
 
       changes.push({
         id: nodeData.id,
@@ -324,6 +324,7 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
       const response = await axios.post("http://localhost:8080/updateMenusOrder", updatesToSendToBackend);
       if (response.data.code === 200) {
         ElMessage.success('菜单顺序已同步到后端');
+        emitter.emit('menu-structure-changed'); // <--- 触发事件
         // 通常不需要刷新，因为 treeNodeList.value 已是最新。
         // 若后端有其他副作用或为了绝对保险，可以取消注释下一行
         // loadMenuTree();

@@ -7,9 +7,10 @@ import ListSellJh from "@/views/Custom_Manage/ListSellJh.vue";
 import ListCustOrder from "@/views/Custom_Manage/ListCustOrder.vue";
 import ListAfterSale from "@/views/Custom_Manage/ListAfterSale.vue";
 import AddMenus from "@/views/Sys_Manage/AddMenus.vue";
+import emitter from "@/eventBus";
 
 // Vue核心
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, onBeforeUnmount } from "vue";
 import { markRaw, shallowRef } from "vue";
 
 // HTTP客户端
@@ -85,7 +86,7 @@ const fetchMenus = async () => {
   } catch (err) {
     console.error('Failed to fetch menus:', err);
     error.value = '加载菜单失败，请刷新页面重试';
-    menus.value = [];
+    menus.value = []; // 清空旧菜单，避免显示错误数据
     isLoading.value = false;
   }
 };
@@ -101,9 +102,23 @@ watch(error, (newError) => {
 });
 
 // 定义默认展开的菜单项
-const defaultOpeneds = computed(() => menus.value.map(menu => menu.id.toString()));
+const defaultOpeneds = computed(() => {
+  // 当 menus 更新时，这个计算属性会自动重新计算
+  return menus.value.map(menu => menu.id.toString());
+});
+
+// --- 事件处理函数，用于响应菜单结构变化 ---
+const handleMenuStructureChanged = () => {
+  fetchMenus(); // 重新获取菜单
+};
+
 onMounted(() => {
-  fetchMenus();
+  fetchMenus(); // 页面加载时获取菜单
+  emitter.on('menu-structure-changed', handleMenuStructureChanged); // <--- 监听事件
+});
+
+onBeforeUnmount(() => {
+  emitter.off('menu-structure-changed', handleMenuStructureChanged); // <--- 组件卸载前移除监听器，防止内存泄漏
 });
 </script>
 
