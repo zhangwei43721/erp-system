@@ -2,7 +2,7 @@
 // --- 模块导入 ---
 import { reactive } from 'vue'; // reactive: 用于创建响应式对象
 import { customerApi } from '@/api/customer';
-
+import { ElMessage } from 'element-plus';
 // --- 响应式状态定义 ---
 // 初始化响应式表单数据对象 (custForm)
 const custForm = reactive({
@@ -19,6 +19,7 @@ function subCustForm() {
   // 使用customerApi发送保存客户请求
   customerApi.saveCustomer(custForm)
     .then((response) => { // 请求成功的回调
+      ElMessage.success("添加成功");
       console.log(response.data); // 打印后端返回的数据
       // 提交成功后，清空表单各项数据
       Object.assign(custForm, {
@@ -30,6 +31,7 @@ function subCustForm() {
       });
     })
     .catch((error) => { // 请求失败的回调
+      ElMessage.error("添加失败");
       console.error('提交失败:', error); // 在控制台打印错误信息
       // 实际项目中，这里通常会显示错误提示给用户
     });
