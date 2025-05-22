@@ -7,6 +7,11 @@ export const roleApi = {
     return request.get(`/rolerList?pageNum=${pageNum}`)
   },
 
+  // 获取角色列表
+  getAllRoles() {
+    return request.get('/loadAllRoles')
+  },
+
   // 更新角色
   updateRole(data) {
     return request.post('/updateRoler', data)
