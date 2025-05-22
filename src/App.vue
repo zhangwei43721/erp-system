@@ -8,6 +8,7 @@ import ListCustOrder from "@/views/Custom_Manage/ListCustOrder.vue";
 import ListAfterSale from "@/views/Custom_Manage/ListAfterSale.vue";
 import AddMenus from "@/views/Sys_Manage/AddMenus.vue";
 import RolerManager from "@/views/Sys_Manage/RolerManager.vue";
+import UserManager from "@/views/Sys_Manage/UserManager.vue";
 import emitter from "@/eventBus";
 
 // Vue核心
@@ -29,7 +30,8 @@ const viewComponents = {
   addSellJh: markRaw(AddSellJh),
   addMenus: markRaw(AddMenus),
   listSellJh: markRaw(ListSellJh),
-  rolerManager: markRaw(RolerManager)
+  rolerManager: markRaw(RolerManager),
+  userManager: markRaw(UserManager)
 };
 
 const views = [
@@ -42,7 +44,7 @@ const views = [
   ,
   ,
   viewComponents.addMenus,
-  ,
+  viewComponents.userManager,
   viewComponents.rolerManager,
 ];
 
