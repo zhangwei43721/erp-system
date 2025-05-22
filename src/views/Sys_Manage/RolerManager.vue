@@ -23,10 +23,10 @@
         <span>操作</span>
       </template>
       <template #default="scope">
-        <el-button size="mini" @click="handleAuthorize(scope.row)">授权</el-button>
-        <el-button v-if="!scope.row.edit" size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-        <el-button v-else size="mini" type="success" @click="handleSave(scope.row)">保存</el-button>
-        <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+        <el-button size="small" @click="handleAuthorize(scope.row)">授权</el-button>
+        <el-button v-if="!scope.row.edit" size="small" @click="handleEdit(scope.row)">编辑</el-button>
+        <el-button v-else size="small" type="success" @click="handleSave(scope.row)">保存</el-button>
+        <el-button size="small" type="danger" @click="handleDelete(scope.row)">删除</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -95,7 +95,7 @@ const treeNodeList = ref([]);
 const treeRef = ref(null);
 const props = {
   label: 'label',
-  children: 'subMenu'
+  children: 'subMenu'  // 改为与后端返回的字段名一致
 };
 
 // 授权对话框状态
@@ -174,7 +174,6 @@ function loadRoleMenus(roleId) {
         if (treeRef.value) {
           // 清除之前的选择
           treeRef.value.setCheckedKeys([]);
-          
           // 设置新的选中项
           if (response.data && response.data.length > 0) {
             // 先找出只包含叶子节点的ID
@@ -223,20 +222,14 @@ function saveRoleAuth() {
     ElMessage.warning("请先选择角色和菜单");
     return;
   }
+  // 获取所有选中的节点（包含父节点）
+  const nodes = treeRef.value.getCheckedNodes(false, true);
+  const arr = [currentRoleId.value];
+  nodes.forEach((item) => {
+    arr.push(item.id);
+  });
   
-  // 获取选中的节点和半选中的节点
-  const checkedKeys = treeRef.value.getCheckedKeys();
-  const halfCheckedKeys = treeRef.value.getHalfCheckedKeys();
-  
-  // 合并所有需要的权限ID
-  const allKeys = [...checkedKeys, ...halfCheckedKeys];
-  
-  const authData = {
-    roleId: currentRoleId.value,
-    menuIds: allKeys
-  };
-  
-  axios.post("http://localhost:8080/saveRoleMenus", authData)
+  axios.post("http://localhost:8080/grantRoleMenus", arr)
     .then((response) => {
       if (response.data.code === 200) {
         ElMessage.success("授权成功");
@@ -303,23 +296,4 @@ function saveRoleForm() {
 }
 </script>
 
-<style scoped>
-::v-deep .el-tree-node.is-current > .el-tree-node__content {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
-}
-::v-deep .el-tree-node__content:hover {
-  background-color: var(--el-fill-color-light);
-}
-::v-deep .el-tree {
-  --el-tree-node-hover-bg-color: var(--el-fill-color-light);
-}
-.custom-tree-node {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 14px;
-  padding-right: 8px;
-}
-</style>
+<style scoped></style>
