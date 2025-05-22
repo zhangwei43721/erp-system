@@ -17,7 +17,7 @@ import { markRaw, shallowRef } from "vue";
 import axios from "axios";
 
 // Element Plus 图标
-import { Folder, Document, Menu as MenuIcon, HomeFilled, Refresh } from '@element-plus/icons-vue';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
 // API基础URL
 const API_BASE_URL = 'http://localhost:8080';
@@ -51,6 +51,18 @@ const currentComponentIndex = ref(0);
 const menus = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
+
+// 图标映射函数
+const getIcon = (iconName) => {
+  // 如果没有图标名称，返回默认图标
+  if (!iconName) return ElementPlusIconsVue.Document;
+  
+  // 尝试获取图标组件
+  const icon = ElementPlusIconsVue[iconName];
+  
+  // 如果图标存在则返回，否则返回默认图标
+  return icon || ElementPlusIconsVue.Document;
+};
 
 // --- 方法定义 ---
 const handlerSelect = async (index) => {
@@ -162,11 +174,17 @@ onBeforeUnmount(() => {
           <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened :default-openeds="defaultOpeneds">
             <el-sub-menu v-for="menu in menus" :key="menu.id" :index="menu.id.toString()">
               <template #title>
-                <el-icon><Folder /></el-icon>
+                <el-icon>
+                  <!-- 动态渲染主菜单图标 -->
+                  <component :is="getIcon(menu.iconName)" />
+                </el-icon>
                 <span>{{ menu.label }}</span>
               </template>
               <el-menu-item v-for="subMenu in menu.subMenu" :key="subMenu.id" :index="subMenu.id.toString()">
-                <el-icon><Document /></el-icon>
+                <el-icon>
+                  <!-- 动态渲染子菜单图标 -->
+                  <component :is="getIcon(subMenu.iconName)" />
+                </el-icon>
                 <span>{{ subMenu.label }}</span>
               </el-menu-item>
             </el-sub-menu>
