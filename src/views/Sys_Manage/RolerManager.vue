@@ -135,7 +135,7 @@ function handleSave(row) {
       if (response.data.code == 200) {
         row.edit = false;
       }
-      ElMessage(response.data.msg);
+      ElMessage(response.data.message);
     })
     .catch((error) => {
       console.log(error);
@@ -233,7 +233,7 @@ function saveRoleAuth() {
         ElMessage.success("授权成功");
         authDialogVisible.value = false;
       } else {
-        ElMessage.error(response.data.msg || "授权失败");
+        ElMessage.error(response.data.message || "授权失败");
       }
     })
     .catch((error) => {
@@ -254,7 +254,7 @@ function handleDelete(row) {
         if (response.data.code == 200) {
           queryRoleList(1);
         }
-        ElMessage(response.data.msg);
+        ElMessage(response.data.message);
       })
       .catch((error) => {
         console.log(error);
@@ -286,7 +286,7 @@ function saveRoleForm() {
         rolerForm.rdesc = '';
         queryRoleList(1);
       }
-      ElMessage(response.data.msg);
+      ElMessage(response.data.message);
     })
     .catch((error) => {
       console.log(error);

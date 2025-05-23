@@ -15,9 +15,9 @@
     <el-table-column prop="title" label="部门" />
     <el-table-column fixed="right" label="操作" width="120">
       <template #default="scope">
-        <el-button link type="primary" size="small">删除
+        <el-button link type="primary" size="small" @click="deleteUser(scope.row)">删除
         </el-button>
-        <el-button link type="primary" size="small">修改
+        <el-button link type="primary" size="small" @click="showUserDialog(scope.row)">修改
         </el-button>
       </template>
     </el-table-column>
@@ -50,14 +50,14 @@
       </el-form-item>
 
       <el-form-item label="角色">
-        <el-select v-model="userForm.rids" placeholder="请选择部门...." style="width: 80%" multiple>
+        <el-select v-model="userForm.rids" placeholder="请选择角色...." style="width: 80%" multiple>
           <el-option v-for="opt in optRoles" :label="opt.rname" :value="opt.id" :key="opt.id" />
 
         </el-select>
       </el-form-item>
 
       <el-form-item>
-        <el-button type="primary" @click="subUpdateCustForm">保存</el-button>
+        <el-button type="primary" @click="subUserForm">保存</el-button>
         <el-button>取消</el-button>
       </el-form-item>
     </el-form>
@@ -110,18 +110,85 @@ const userForm = reactive({
   title: '',
   rids: []
 });
+
+//声明变量保存添加用户信息和更新用户信息的url
+var url = ""
 //声明角色的集合
 const optRoles = ref([]);
 function openUserDialog() {
   dialogUserVisible.value = true;
   //发送ajax请求加载所有角色信息
-  roleApi.getAllRoles()
+  userApi.loadAllRoles()
     .then((response) => {
       optRoles.value = response.data;
     })
     .catch((error) => {
       console.log(error);
     })
+}
+
+function subUserForm() {
+  userApi.saveUser(userForm)
+    .then((response) => {
+      if (response.data.code == 200) {
+        //关闭对话框
+        dialogUserVisible.value = false;
+      }
+      ElMessage(response.data.message);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+//打开对话框实现用户信息狐仙
+function showUserDialog(row) {
+  dialogUserVisible.value = true;
+  //将row赋值给userForm表单
+  userForm.age = row.age;
+  userForm.edu = row.edu;
+  userForm.id = row.id;
+  userForm.uname = row.uname;
+  userForm.phone = row.phone;
+  userForm.title = row.title;
+  //加载下拉列表框所有角色信息
+  userApi.loadAllRoles()
+    .then((response) => {
+      optRoles.value = response.data;
+      //根据用户id查询用户的角色id集合
+      //将查询到的角色id集合赋值给表单的rids属性
+      userApi.queryUserRids(row.id)
+        .then((response => {
+          //将响应的角色id的集合赋值给表单的数组
+          userForm.rids = response.data;
+        }));
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+}
+//删除用户信息
+function deleteUser(row) {
+  ElMessageBox.confirm('是否删除该用户?', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning'
+  }).then(() => {
+    userApi.deleteUser(row.id)
+      .then((response) => {
+        if (response.data.code == 200) {
+          queryUserList(1);//刷新列表
+        }
+        ElMessage(response.data.message);
+      }).catch((error) => {
+        console.log(error);
+      });
+  }).catch(() => {
+    ElMessage({
+      type: 'info',
+      message: '已取消删除'
+    });
+  });
 }
 </script>
 

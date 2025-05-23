@@ -120,7 +120,7 @@ function updateMenu() {
       }
       ElMessage({
         type: response.data.code === 200 ? 'success' : 'error',
-        message: response.data.msg || (response.data.code === 200 ? '更新成功' : '更新失败')
+        message: response.data.message || (response.data.code === 200 ? '更新成功' : '更新失败')
       });
     })
     .catch((error) => {
@@ -161,7 +161,7 @@ function subMenuForm() {
       }
       ElMessage({
         type: response.data.code === 200 ? 'success' : 'error',
-        message: response.data.msg || (response.data.code === 200 ? '添加成功' : '添加失败')
+        message: response.data.message || (response.data.code === 200 ? '添加成功' : '添加失败')
       });
     })
     .catch((error) => {
@@ -186,7 +186,7 @@ async function delMenus(node, data) {
       loadMenuTree();
       emitter.emit('menu-structure-changed'); // <--- 触发事件
     }
-    ElMessage({ type: response.data.code === 200 ? 'success' : 'error', message: response.data.msg });
+    ElMessage({ type: response.data.code === 200 ? 'success' : 'error', message: response.data.message });
   } catch (error) {
     if (error !== 'cancel' && error !== 'close') {
       console.error("删除失败:", error);
@@ -329,7 +329,7 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
         // 若后端有其他副作用或为了绝对保险，可以取消注释下一行
         // loadMenuTree();
       } else {
-        ElMessage.error(response.data.msg || '后端同步失败，正在还原...');
+        ElMessage.error(response.data.message || '后端同步失败，正在还原...');
         loadMenuTree(); // 同步失败，从后端恢复
       }
     } catch (error) {

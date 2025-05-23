@@ -6,7 +6,10 @@ export const userApi = {
   getUserList(pageNum) {
     return request.get(`/userList?pageNum=${pageNum}`)
   },
-
+  //获取用户列表（不分页）
+  loadAllRoles() {
+    return request.get('/loadAllRoles')
+  },
   // 保存用户
   saveUser(data) {
     return request.post('/saveUser', data)
@@ -19,6 +22,6 @@ export const userApi = {
 
   // 删除用户
   deleteUser(id) {
-    return request.delete(`/deleteUser/${id}`)
+    return request.post('/deleteUser', { id })
   }
 }

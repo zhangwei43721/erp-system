@@ -175,9 +175,9 @@ function subReplayForm() {
       if (response.data.code == 200) {
         dialogReplayVisible.value = false;
         replayForm.content = '';  //清空回复内容
-        ElMessage(response.data.msg);
+        ElMessage(response.data.message);
       } else {
-        ElMessage(response.data.msg);
+        ElMessage(response.data.message);
       }
     })
     .catch((error) => {
