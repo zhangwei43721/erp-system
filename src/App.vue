@@ -66,10 +66,10 @@ const error = ref(null);
 const getIcon = (iconName) => {
   // 如果没有图标名称，返回默认图标
   if (!iconName) return ElementPlusIconsVue.Document;
-  
+
   // 尝试获取图标组件
   const icon = ElementPlusIconsVue[iconName];
-  
+
   // 如果图标存在则返回，否则返回默认图标
   return icon || ElementPlusIconsVue.Document;
 };
@@ -145,7 +145,9 @@ onBeforeUnmount(() => {
       <!-- 顶部Header区域 -->
       <el-header class="app-header">
         <div class="header-content">
-          <el-icon class="header-icon"><component :is="ElementPlusIconsVue.HomeFilled" /></el-icon>
+          <el-icon class="header-icon">
+            <component :is="ElementPlusIconsVue.HomeFilled" />
+          </el-icon>
           <h1 class="app-title">ERP管理系统</h1>
           <span class="app-subtitle">ikun小组</span>
         </div>
@@ -155,7 +157,9 @@ onBeforeUnmount(() => {
         <!-- 左侧Aside区域 (导航菜单) -->
         <el-aside width="240px" class="app-sidebar">
           <div class="menu-header">
-            <el-icon><component :is="ElementPlusIconsVue.Menu" /></el-icon>
+            <el-icon>
+              <component :is="ElementPlusIconsVue.Menu" />
+            </el-icon>
             系统菜单
           </div>
 
@@ -176,7 +180,8 @@ onBeforeUnmount(() => {
           <el-alert v-if="error && !hasMenus" :title="error" type="error" show-icon @close="error = null" />
 
           <!-- 菜单内容 -->
-          <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened :default-openeds="defaultOpeneds">
+          <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened
+            :default-openeds="defaultOpeneds">
             <el-sub-menu v-for="menu in menus" :key="menu.id" :index="menu.id.toString()">
               <template #title>
                 <el-icon>
@@ -284,12 +289,15 @@ onBeforeUnmount(() => {
   height: 100%;
   transition: width 0.3s ease;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05);
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 .app-sidebar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 .menu-header {
@@ -336,12 +344,15 @@ onBeforeUnmount(() => {
   border-radius: 8px;
   margin: 16px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
 }
 
 .app-main::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
+  display: none;
+  /* Chrome, Safari, Opera */
 }
 
 /* 加载状态 */

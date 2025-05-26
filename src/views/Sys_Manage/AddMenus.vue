@@ -2,20 +2,9 @@
   <h2>管理菜单</h2>
   <div style="text-align: left">
     <h4>选择新增节点的父节点（支持拖拽调整顺序）</h4>
-    <el-tree
-        :props="props"
-        :data="treeNodeList"
-        node-key="id"
-        default-expand-all
-        :expand-on-click-node="false"
-        ref="treeRef"
-        @node-click="hanldNodeClick"
-        :highlight-current="true"
-        draggable
-        :allow-drop="allowDrop"
-        :allow-drag="allowDrag"
-        @node-drop="handleDrop"
-      >
+    <el-tree :props="props" :data="treeNodeList" node-key="id" default-expand-all :expand-on-click-node="false"
+      ref="treeRef" @node-click="hanldNodeClick" :highlight-current="true" draggable :allow-drop="allowDrop"
+      :allow-drag="allowDrag" @node-drop="handleDrop">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <span>{{ node.label }}</span>
@@ -27,23 +16,22 @@
       </template>
     </el-tree>
   </div>
-  <hr/>
+  <hr />
   <!-- 添加表单控件 -->
   <el-form :model="menuForm" label-width="120px">
     <el-form-item label="新增菜单名称">
-      <el-input v-model="menuForm.label" style="width: 50%"/>
+      <el-input v-model="menuForm.label" style="width: 50%" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="subMenuForm">保存</el-button>
-      <el-button @click="resetForm">取消</el-button>
-      <el-button @click="clearTreeSelection" style="margin-left: 10px;">取消当前选中节点</el-button>
+      <el-button @click="resetForm">重置表单</el-button>
     </el-form-item>
   </el-form>
   <!-- 修改弹窗 -->
   <el-dialog title="修改菜单" v-model="dialogVisible" width="30%">
     <el-form :model="editForm" label-width="120px">
       <el-form-item label="菜单名称">
-        <el-input v-model="editForm.label" style="width: 50%"/>
+        <el-input v-model="editForm.label" style="width: 50%" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -130,20 +118,17 @@ function updateMenu() {
 }
 
 function resetForm() {
+  // 重置表单数据
   menuForm.label = '';
   menuForm.component = null;
   currentSelectedPidForAdd = 0;
+
+  // 清除树选择
   if (treeRef.value) {
     treeRef.value.setCurrentKey(null);
   }
-}
-// --- 取消树节点选中 ---
-function clearTreeSelection() {
-  if (treeRef.value) {
-    treeRef.value.setCurrentKey(null); // 取消 Element Plus Tree 的当前高亮节点
-  }
-  currentSelectedPidForAdd = 0; // 重置用于添加新节点的父节点ID
-  ElMessage.info('已取消节点选择'); // 可选：给用户一个反馈
+
+  ElMessage.info('已重置表单');
 }
 
 function subMenuForm() {
@@ -246,11 +231,11 @@ const allowDrop = (draggingNode, dropNode, type) => {
       return true; // 允许一级节点之间同级排序 (prev/next)
     }
     if (dropLevel === 2) { // 目标是二级节点
-        // 通常不允许一级节点直接操作二级节点来改变层级或排序，除非特定场景
-        // 例如：如果想把一级节点P1放到二级节点S1的父节点下，与S1同级，
-        // 这种情况应该通过拖拽P1到S1的父节点P2的 prev/next/inner 来实现。
-        // 这里先保守禁止，一级节点不能直接以二级节点为目标改变结构。
-        return false;
+      // 通常不允许一级节点直接操作二级节点来改变层级或排序，除非特定场景
+      // 例如：如果想把一级节点P1放到二级节点S1的父节点下，与S1同级，
+      // 这种情况应该通过拖拽P1到S1的父节点P2的 prev/next/inner 来实现。
+      // 这里先保守禁止，一级节点不能直接以二级节点为目标改变结构。
+      return false;
     }
   }
 
@@ -260,8 +245,8 @@ const allowDrop = (draggingNode, dropNode, type) => {
       // 二级节点可以拖入一级节点内部成为其子节点 (type === 'inner')
       // 二级节点也可以拖到一级节点的前后，实现升级为新的一级节点
       if (type === 'prev' || type === 'next') {
-          // 允许二级节点升级为一级节点，与目标一级节点同级
-          return true;
+        // 允许二级节点升级为一级节点，与目标一级节点同级
+        return true;
       }
       // type === 'inner'，成为其子节点
       return true;
@@ -342,16 +327,19 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
 </script>
 
 <style scoped>
-::v-deep .el-tree-node.is-current > .el-tree-node__content {
+::v-deep .el-tree-node.is-current>.el-tree-node__content {
   background-color: var(--el-color-primary-light-9);
   color: var(--el-color-primary);
 }
+
 ::v-deep .el-tree-node__content:hover {
   background-color: var(--el-fill-color-light);
 }
+
 ::v-deep .el-tree {
   --el-tree-node-hover-bg-color: var(--el-fill-color-light);
 }
+
 .custom-tree-node {
   flex: 1;
   display: flex;
