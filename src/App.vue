@@ -54,13 +54,39 @@ const views = [
   viewComponents.rolerManager,
   ,
   viewComponents.categoryManager
+  ,
+  ,
 ];
 
-const currentComponent = shallowRef(views[0] || null); // Handle case where views might be initially empty or first element is problematic
-const currentComponentIndex = ref(0);
+const currentComponent = shallowRef(null); // 修改初始值，等待 onMounted 中恢复或设置
+const activeMenuId = ref(null); // 新增：用于存储当前激活的菜单ID，并绑定到 el-menu 的 default-active
 const menus = ref([]);
 const isLoading = ref(false);
 const error = ref(null);
+
+// --- 辅助函数 ---
+const findMenuById = (menusToSearch, id) => {
+  if (!id || !menusToSearch) return null;
+  for (const menu of menusToSearch) {
+    if (menu.subMenu) {
+      for (const sub of menu.subMenu) {
+        if (sub.id.toString() === id) return sub;
+      }
+    }
+  }
+  return null;
+};
+
+const getFirstAvailableSubMenuId = (menusToSearch) => {
+  if (menusToSearch && menusToSearch.length > 0) {
+    for (const menu of menusToSearch) {
+      if (menu.subMenu && menu.subMenu.length > 0 && menu.subMenu[0].id != null) {
+        return menu.subMenu[0].id.toString();
+      }
+    }
+  }
+  return null;
+};
 
 // 图标映射函数
 const getIcon = (iconName) => {
@@ -75,36 +101,39 @@ const getIcon = (iconName) => {
 };
 
 // --- 方法定义 ---
-const handlerSelect = async (index) => {
+const handlerSelect = async (index) => { // index is menu id string
+  error.value = null;
   try {
-    error.value = null;
-    const response = await appApi.getComponentIndex(index);
+    const response = await appApi.getComponentIndex(index); // index is the menu item's ID
     const compIndex = response.data;
     if (compIndex >= 0 && compIndex < views.length && views[compIndex]) {
-      currentComponentIndex.value = compIndex;
       currentComponent.value = views[compIndex];
+      localStorage.setItem('selectedMenuId', index); // 保存选择到 localStorage
+      activeMenuId.value = index; // 更新激活的菜单ID
     } else {
-      console.warn(`Invalid component index received or component not found at index: ${compIndex}`);
-      error.value = '无法加载请求的组件';
+      currentComponent.value = null; // 清除组件
+      error.value = `无法找到与菜单ID ${index} 对应的组件。`;
+      console.warn(`Invalid component index or component not found for menuId: ${index}, compIndex: ${compIndex}`);
     }
   } catch (err) {
-    console.error('Failed to fetch component index:', err);
-    error.value = '加载组件失败，请稍后再试';
-  }
+    currentComponent.value = null; // 清除组件
+    error.value = `加载菜单ID ${index} 对应的组件失败。`;
+    console.error(`Failed to fetch component index for menuId ${index}:`, err);
+  } 
 };
 
 const fetchMenus = async () => {
+  isLoading.value = true; // 开始加载菜单
+  error.value = null;
   try {
-    isLoading.value = true;
-    error.value = null;
     const response = await appApi.getMenus();
     menus.value = response.data;
-    isLoading.value = false;
   } catch (err) {
     console.error('Failed to fetch menus:', err);
     error.value = '加载菜单失败，请刷新页面重试';
     menus.value = []; // 清空旧菜单，避免显示错误数据
-    isLoading.value = false;
+  } finally {
+    isLoading.value = false; // 加载菜单结束
   }
 };
 
@@ -130,8 +159,42 @@ const handleMenuStructureChanged = () => {
 };
 
 onMounted(() => {
-  fetchMenus(); // 页面加载时获取菜单
-  emitter.on('menu-structure-changed', handleMenuStructureChanged); // <--- 监听事件
+  emitter.on('menu-structure-changed', handleMenuStructureChanged);
+
+  const initializeApp = async () => {
+    await fetchMenus(); // 等待菜单加载完成
+
+    let initialMenuIdToLoad = null;
+    const savedMenuId = localStorage.getItem('selectedMenuId');
+
+    // 只有当菜单加载成功 (menus.value 有内容) 才尝试恢复或选择默认
+    if (menus.value && menus.value.length > 0) {
+      if (savedMenuId) {
+        const menuItem = findMenuById(menus.value, savedMenuId);
+        if (menuItem) {
+          initialMenuIdToLoad = savedMenuId;
+        } else {
+          localStorage.removeItem('selectedMenuId'); // 无效的 ID，清除
+        }
+      }
+
+      // 如果没有从 localStorage 加载，则加载第一个可用的子菜单
+      if (!initialMenuIdToLoad) {
+        initialMenuIdToLoad = getFirstAvailableSubMenuId(menus.value);
+      }
+    } // else: 菜单为空或加载失败，initialMenuIdToLoad 保持 null
+
+    if (initialMenuIdToLoad) {
+      activeMenuId.value = initialMenuIdToLoad;
+      await handlerSelect(initialMenuIdToLoad); // handlerSelect 会处理组件加载的 isLoading
+    } else {
+      // 没有菜单项可加载 (例如，菜单为空，或第一个菜单项也无法确定)
+      currentComponent.value = null;
+      activeMenuId.value = null;
+    }
+  };
+
+  initializeApp();
 });
 
 onBeforeUnmount(() => {
@@ -180,7 +243,7 @@ onBeforeUnmount(() => {
           <el-alert v-if="error && !hasMenus" :title="error" type="error" show-icon @close="error = null" />
 
           <!-- 菜单内容 -->
-          <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="'1'" unique-opened
+          <el-menu class="app-menu" @select="handlerSelect" v-if="hasMenus" :default-active="activeMenuId" unique-opened
             :default-openeds="defaultOpeneds">
             <el-sub-menu v-for="menu in menus" :key="menu.id" :index="menu.id.toString()">
               <template #title>
