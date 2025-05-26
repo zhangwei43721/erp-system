@@ -55,7 +55,7 @@
   </el-table>
   <hr />
 
-  <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="total"
+  <el-pagination size="small" background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="total"
     class="mt-4" @current-change="handlerSalePageChange" />
 
   <!-- 添加对话框控件 -->
@@ -107,7 +107,7 @@
       <!--   分页    -->
       <hr />
 
-      <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="totalReplay"
+      <el-pagination size="small" background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="totalReplay"
         class="mt-4" @current-change="handlerReplayPageChange" />
 
     </div>

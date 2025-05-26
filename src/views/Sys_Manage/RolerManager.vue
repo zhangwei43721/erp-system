@@ -32,7 +32,7 @@
   </el-table>
   <!-- 分页组件 -->
   <hr />
-  <el-pagination small background :page-size="10" :pager-count="10" layout="prev, pager, next" :total="total"
+  <el-pagination size="small" background :page-size="10" :pager-count="7" layout="prev, pager, next" :total="total"
     class="mt-4" @current-change="rolerPageChange" />
   <!-- 角色信息对话框 -->
   <!-- 回显客户信息的对话框 -->

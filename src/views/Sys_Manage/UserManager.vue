@@ -26,10 +26,10 @@
   <hr />
   <!-- page分页组件 -->
   <el-pagination 
-    small 
+    size="small"
     background 
     :page-size="pageSize" 
-    :pager-count="10" 
+    :pager-count="7" 
     layout="prev, pager, next" 
     :total="total"
     class="mt-4" 

@@ -52,7 +52,7 @@
   <hr />
 
   <el-pagination
-    small
+    size="small"
     background
     :page-size="10"
     :pager-count="10"
