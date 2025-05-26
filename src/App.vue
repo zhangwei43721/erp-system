@@ -10,6 +10,8 @@ import AddMenus from "@/views/Sys_Manage/AddMenus.vue";
 import RolerManager from "@/views/Sys_Manage/RolerManager.vue";
 import UserManager from "@/views/Sys_Manage/UserManager.vue";
 import StockStatistics from "@/views/statistics/StockStatistics.vue";
+import CategoryManager from "@/views/commodity/CategoryManager.vue";
+
 import emitter from "@/eventBus";
 
 // Vue核心
@@ -18,6 +20,7 @@ import { markRaw, shallowRef } from "vue";
 
 // Element Plus 图标
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
+import { Refresh } from '@element-plus/icons-vue';
 
 // API 服务
 import { appApi } from '@/api/app';
@@ -33,7 +36,8 @@ const viewComponents = {
   listSellJh: markRaw(ListSellJh),
   rolerManager: markRaw(RolerManager),
   userManager: markRaw(UserManager),
-  stockStatistics: markRaw(StockStatistics)
+  stockStatistics: markRaw(StockStatistics),
+  categoryManager: markRaw(CategoryManager),
 };
 
 const views = [
@@ -43,14 +47,16 @@ const views = [
   viewComponents.listCustOrder,
   viewComponents.addSellJh,
   viewComponents.listSellJh,
-  ,
+  viewComponents.stockStatistics,
   viewComponents.stockStatistics,
   viewComponents.addMenus,
   viewComponents.userManager,
   viewComponents.rolerManager,
+  ,
+  viewComponents.categoryManager
 ];
 
-const currentComponent = shallowRef(views[0]);
+const currentComponent = shallowRef(views[0] || null); // Handle case where views might be initially empty or first element is problematic
 const currentComponentIndex = ref(0);
 const menus = ref([]);
 const isLoading = ref(false);
@@ -74,11 +80,11 @@ const handlerSelect = async (index) => {
     error.value = null;
     const response = await appApi.getComponentIndex(index);
     const compIndex = response.data;
-    if (compIndex >= 0 && compIndex < views.length) {
+    if (compIndex >= 0 && compIndex < views.length && views[compIndex]) {
       currentComponentIndex.value = compIndex;
       currentComponent.value = views[compIndex];
     } else {
-      console.warn(`Invalid component index received: ${compIndex}`);
+      console.warn(`Invalid component index received or component not found at index: ${compIndex}`);
       error.value = '无法加载请求的组件';
     }
   } catch (err) {
