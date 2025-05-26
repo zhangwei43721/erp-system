@@ -55,7 +55,7 @@
     size="small"
     background
     :page-size="10"
-    :pager-count="10"
+    :pager-count="7"
     layout="prev, pager, next"
     :total="total"
     class="mt-4"
