@@ -201,25 +201,5 @@ function handleDelete(node, data) {
   padding-right: 8px;
 }
 
-.operation-buttons {
-  margin-left: 10px;
-}
 
-.category-form {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-:deep(.el-tree-node.is-current > .el-tree-node__content) {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
-}
-
-:deep(.el-tree-node__content:hover) {
-  background-color: var(--el-fill-color-light);
-}
-
-:deep(.el-tree) {
-  --el-tree-node-hover-bg-color: var(--el-fill-color-light);
-}
 </style>
