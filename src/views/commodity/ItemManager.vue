@@ -69,7 +69,6 @@
         :on-remove="handleRemove"
         :on-preview="handlePictureCardPreview"
         :file-list="fileList"
-        :preview-teleported="true"
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
@@ -216,21 +215,25 @@
     </template>
   </el-dialog>
   <!-- 图片预览的对话框 -->
-  <el-image-viewer
-    v-if="dialogVisible"
-    :url-list="[dialogImageUrl]"
-    :z-index="3000"
-    teleported
-    @close="dialogVisible = false"
-  />
+  <el-dialog 
+    v-model="dialogVisible" 
+    title="图片预览" 
+    :width="dialogWidth"
+    :modal="true"
+    append-to-body
+    :z-index="2000"  
+    destroy-on-close
+  >
+    <img style="width: 100%; max-height: 80vh; object-fit: contain;" :src="dialogImageUrl" alt="Preview Image" />
+  </el-dialog>
 </template>
 
 <script setup>
 import { reactive, ref, computed, onMounted } from "vue";
-import { Plus } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox, ElImageViewer } from "element-plus";
+import { Plus, ZoomIn } from '@element-plus/icons-vue';
+import axios from "axios";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { categoryApi } from "@/api/category";
-import axios from '@/api/config';
 
 // 对话框状态和图片上传相关
 const dialogItemVisible = ref(false);
@@ -592,43 +595,72 @@ function handlePageChange(value) {
 </script>
 
 <style scoped>
-.el-form {
-  margin-top: 20px;
-}
-.el-form-item {
-  margin-bottom: 20px;
-}
-.el-upload-list--picture-card .el-upload-list__item {
-  width: 100px;
-  height: 100px;
-}
-
-/* 图片预览样式 */
-:deep(.el-dialog) {
-  display: flex;
-  flex-direction: column;
-  margin: 0 !important;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-
-:deep(.el-dialog__body) {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.item-management {
   padding: 20px;
 }
 
+.action-bar {
+  margin-bottom: 20px;
+}
+
+.image-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.table-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+}
+
+.more-images {
+  font-size: 12px;
+  color: #909399;
+}
+
+.no-image {
+  color: #c0c4cc;
+  font-size: 12px;
+}
+
+.pagination {
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.upload-section {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.item-form :deep(.el-form-item) {
+  margin-bottom: 16px;
+}
+
+.item-form :deep(.el-select),
+.item-form :deep(.el-date-picker) {
+  width: 100%;
+}
+
 @media (max-width: 768px) {
-  .el-form-item {
-    margin-bottom: 15px;
+  .item-management {
+    padding: 10px;
   }
-  .el-upload-list--picture-card .el-upload-list__item {
-    width: 80px;
-    height: 80px;
+  
+  .item-form :deep(.el-col) {
+    width: 100% !important;
+  }
+  
+  .table-image {
+    width: 30px;
+    height: 30px;
   }
 }
 </style>
