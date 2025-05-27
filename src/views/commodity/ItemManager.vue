@@ -9,18 +9,9 @@
     <el-table-column label="商品图片" width="150">
       <template #default="{ row }">
         <div v-if="row.imgs && row.imgs.length" class="image-preview">
-          <el-image
-            v-for="(img, index) in row.imgs"
-            :key="index"
-            :src="img"
-            :preview-src-list="row.imgs"
-            :initial-index="index"
-            :preview-teleported="true"
-            :z-index="3000"
-            fit="cover"
-            class="table-image"
-            style="width: 50px; height: 50px; margin-right: 4px"
-          />
+          <el-image v-for="(img, index) in row.imgs" :key="index" :src="img" :preview-src-list="row.imgs"
+            :initial-index="index" :preview-teleported="true" :z-index="3000" fit="cover" class="table-image"
+            style="width: 50px; height: 50px; margin-right: 4px" />
         </div>
         <span v-else>无图片</span>
       </template>
@@ -45,33 +36,19 @@
   </el-table>
 
   <!-- 分页器 -->
-  <el-pagination
-    size="small"
-    background
-    :page-size="10"
-    :pager-count="5"
-    layout="prev, pager, next"
-    :total="total"
-    class="mt-4"
-    @current-change="handlePageChange"
-  />
+  <el-pagination size="small" background :page-size="10" :pager-count="5" layout="prev, pager, next" :total="total"
+    class="mt-4" @current-change="handlePageChange" />
 
-  <!-- 添加商品信息的对话框 -->
+  <!-- 添加商品对话框 -->
   <el-dialog v-model="dialogItemVisible" title="添加商品" :width="dialogWidth">
     <div style="margin-bottom: 20px;">
       <span>商品图片:</span>
-      <el-upload
-        :action="uploadImageUrl"
-        list-type="picture-card"
-        :auto-upload="true"
-        method="post"
-        :on-success="handleAvatarSuccess"
-        :on-remove="handleRemove"
-        :file-list="fileList"
-        :on-preview="handlePictureCardPreview"
-        preview-teleported
-      >
-        <el-icon><Plus /></el-icon>
+      <el-upload :action="uploadImageUrl" list-type="picture-card" :auto-upload="true" method="post"
+        :on-success="handleAvatarSuccess" :on-remove="handleRemove" :file-list="fileList"
+        :on-preview="handlePictureCardPreview" preview-teleported>
+        <el-icon>
+          <Plus />
+        </el-icon>
       </el-upload>
     </div>
     <el-form :model="itemForm" :rules="itemRules" label-width="120px" ref="itemFormRef">
@@ -89,9 +66,7 @@
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="商品类型" prop="typeId">
             <el-input v-model="selectedTypeName" disabled placeholder="点击选择商品类型" />
-            <el-button type="primary" size="small" style="margin-left: 10px;" @click="openTypeDialog">
-              选择
-            </el-button>
+            <el-button type="primary" size="small" style="margin-left: 10px;" @click="openTypeDialog">选择</el-button>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
@@ -101,35 +76,36 @@
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="品牌" prop="brandId">
-            <el-select v-model="itemForm.brandId" placeholder="请选择品牌" style="width: 100%;">
+            <el-select v-model="itemForm.brandId" placeholder="请选择品牌">
               <el-option v-for="item in brandList" :key="item.brandId" :label="item.brandName" :value="item.brandId" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="门店" prop="storeId">
-            <el-select v-model="itemForm.storeId" placeholder="请选择门店" style="width: 100%;">
+            <el-select v-model="itemForm.storeId" placeholder="请选择门店">
               <el-option v-for="item in storeList" :key="item.storeId" :label="item.storeName" :value="item.storeId" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="供应商" prop="supplyId">
-            <el-select v-model="itemForm.supplyId" placeholder="请选择供应商" style="width: 100%;">
-              <el-option v-for="item in supplyList" :key="item.supplyId" :label="item.supplyName" :value="item.supplyId" />
+            <el-select v-model="itemForm.supplyId" placeholder="请选择供应商">
+              <el-option v-for="item in supplyList" :key="item.supplyId" :label="item.supplyName"
+                :value="item.supplyId" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="产地" prop="placeId">
-            <el-select v-model="itemForm.placeId" placeholder="请选择产地" style="width: 100%;">
+            <el-select v-model="itemForm.placeId" placeholder="请选择产地">
               <el-option v-for="item in placeList" :key="item.placeId" :label="item.placeName" :value="item.placeId" />
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="单位" prop="unitId">
-            <el-select v-model="itemForm.unitId" placeholder="请选择单位" style="width: 100%;">
+            <el-select v-model="itemForm.unitId" placeholder="请选择单位">
               <el-option v-for="item in unitList" :key="item.unitId" :label="item.unitName" :value="item.unitId" />
             </el-select>
           </el-form-item>
@@ -156,12 +132,12 @@
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="生产日期" prop="itemDate">
-            <el-date-picker v-model="itemForm.itemDate" type="date" placeholder="选择生产日期" style="width: 100%;" />
+            <el-date-picker v-model="itemForm.itemDate" type="date" placeholder="选择生产日期" />
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="到期日期" prop="endDate">
-            <el-date-picker v-model="itemForm.endDate" type="date" placeholder="选择到期日期" style="width: 100%;" />
+            <el-date-picker v-model="itemForm.endDate" type="date" placeholder="选择到期日期" />
           </el-form-item>
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
@@ -176,7 +152,7 @@
         </el-col>
         <el-col :xs="24" :sm="12" :md="8">
           <el-form-item label="商品状态" prop="statue">
-            <el-select v-model="itemForm.statue" placeholder="请选择状态" style="width: 100%;">
+            <el-select v-model="itemForm.statue" placeholder="请选择状态">
               <el-option label="上架" :value="1" />
               <el-option label="下架" :value="0" />
             </el-select>
@@ -194,18 +170,11 @@
       <el-button type="primary" @click="submitItem">保存</el-button>
     </template>
   </el-dialog>
+
   <!-- 商品类型选择对话框 -->
   <el-dialog v-model="dialogTypeVisible" title="选择商品类型" :width="dialogWidth">
-    <el-tree
-      :props="typeTreeConfig"
-      :data="typeList"
-      default-expand-all
-      node-key="id"
-      ref="typeTreeRef"
-      :highlight-current="true"
-      :expand-on-click-node="false"
-      @node-click="handleTypeNodeClick"
-    >
+    <el-tree :props="typeTreeConfig" :data="typeList" default-expand-all node-key="id" ref="typeTreeRef"
+      :highlight-current="true" :expand-on-click-node="false" @node-click="handleTypeNodeClick">
       <template #default="{ node }">
         <span>{{ node.label }}</span>
       </template>
@@ -215,18 +184,10 @@
       <el-button type="primary" @click="confirmTypeSelection">确认</el-button>
     </template>
   </el-dialog>
-    <!-- 图片预览组件 -->
-  <el-image-viewer
-    v-if="dialogVisible"
-    :url-list="[dialogImageUrl]"
-    :initial-index="0"
-    :hide-on-click-modal="false"
-    :zoom-rate="1.2"
-    :teleported="true"
-    :z-index="3000"
-    @close="dialogVisible = false"
-  />
-  
+
+  <!-- 图片预览组件 -->
+  <el-image-viewer v-if="dialogVisible" :url-list="[dialogImageUrl]" :initial-index="0" :hide-on-click-modal="false"
+    :zoom-rate="1.2" :teleported="true" :z-index="3000" @close="dialogVisible = false" />
 </template>
 
 <script setup>
@@ -234,31 +195,20 @@ import { reactive, ref, computed, onMounted } from "vue";
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from "element-plus";
 import { categoryApi } from "@/api/category";
-import { 
-  getItemList, 
-  saveItem, 
-  updateItem, 
-  deleteItem,
-  getSupplyList,
-  getPlaceList,
-  getUnitList,
-  getBrandList,
-  getStoreList,
-  uploadImageUrl
-} from "@/api/item";
+import { itemApi, uploadImageUrl } from "@/api/item";
 
 // 对话框状态和图片上传相关
 const dialogItemVisible = ref(false);
 const dialogTypeVisible = ref(false);
 const dialogVisible = ref(false);
-const dialogImageUrl = ref('')
+const dialogImageUrl = ref('');
 const itemFormRef = ref(null);
 const typeTreeRef = ref(null);
 const fileList = ref([]);
 
 // 列表数据
-const itemList = ref([]); // 商品列表数据
-const total = ref(0);     // 总记录数
+const itemList = ref([]);
+const total = ref(0);
 
 // 响应式对话框宽度
 const dialogWidth = computed(() => {
@@ -292,7 +242,7 @@ const itemForm = reactive({
   hotTitle: '',
   facturer: '',
   statue: 1,
-  imgs: [], // 改为数组存储多张图片
+  imgs: [],
   createBy: ''
 });
 
@@ -326,15 +276,10 @@ const unitList = ref([]);
 const brandList = ref([]);
 const storeList = ref([]);
 
-// 打开商品信息对话框
+// 打开商品信息对话框并加载所有数据
 function openItemDialog() {
   dialogItemVisible.value = true;
-  loadTypeList();
-  loadSupplyList();
-  loadPlaceList();
-  queryUnitList();
-  queryBrandList();
-  queryStoreList();
+  loadAllData();
 }
 
 // 打开商品类型选择对话框
@@ -373,16 +318,9 @@ function confirmTypeSelection() {
 function handleAvatarSuccess(response) {
   const imageUrl = typeof response === 'string' ? response : (response.url || '');
   if (imageUrl) {
-    if (!Array.isArray(itemForm.imgs)) {
-      itemForm.imgs = [];
-    }
+    if (!Array.isArray(itemForm.imgs)) itemForm.imgs = [];
     itemForm.imgs.push(imageUrl);
-    // 更新fileList
-    fileList.value.push({
-      url: imageUrl,
-      status: 'success'
-    });
-    console.log('保存的图片地址列表：', itemForm.imgs);
+    fileList.value.push({ url: imageUrl, status: 'success' });
   }
 }
 
@@ -396,26 +334,24 @@ function handleRemove(file) {
 }
 
 // 图片预览
-const handlePictureCardPreview = (uploadFile) => {
-  dialogImageUrl.value = uploadFile.url
-  dialogVisible.value = true
+function handlePictureCardPreview(uploadFile) {
+  dialogImageUrl.value = uploadFile.url;
+  dialogVisible.value = true;
 }
 
 // 提交表单
 function submitItem() {
   itemFormRef.value.validate((valid) => {
     if (valid) {
-      const apiCall = itemForm.id ? updateItem(itemForm) : saveItem(itemForm);
-      
-      apiCall.then((response) => {
-          // 检查响应状态
+      const apiCall = itemForm.id ? itemApi.updateItem(itemForm) : itemApi.saveItem(itemForm);
+      apiCall
+        .then((response) => {
           if (response.data && response.data.code === 500) {
             ElMessage.error(response.data.message || '操作失败，请稍后重试');
             return;
           }
           ElMessage.success(itemForm.id ? '修改成功' : '添加成功');
           dialogItemVisible.value = false;
-          // 清空表单
           Object.assign(itemForm, {
             itemNum: '', itemName: '', typeId: null, store: 0, brandId: null,
             storeId: null, supplyId: null, placeId: null, unitId: null, price: 0,
@@ -423,14 +359,10 @@ function submitItem() {
             hotTitle: '', facturer: '', statue: 1, imgs: [], createBy: ''
           });
           selectedTypeName.value = '';
-          // 清空图片列表
           fileList.value = [];
-          // 刷新商品列表
           loadItemList(1);
         })
         .catch((error) => {
-          console.error(error);
-          // 获取具体的错误信息
           const errorMsg = error.response?.data?.message || '保存失败，请稍后重试';
           ElMessage.error(errorMsg);
         });
@@ -438,83 +370,48 @@ function submitItem() {
   });
 }
 
-// 加载商品类型（从类目管理页获取树形数据）
+// 加载所有数据
+function loadAllData() {
+  Promise.all([
+    categoryApi.getCategoryTree(),
+    itemApi.getSupplyList(),
+    itemApi.getPlaceList(),
+    itemApi.getUnitList(),
+    itemApi.getBrandList(),
+    itemApi.getStoreList()
+  ])
+    .then(([typeRes, supplyRes, placeRes, unitRes, brandRes, storeRes]) => {
+      typeList.value = typeRes.data;
+      supplyList.value = supplyRes.data;
+      placeList.value = placeRes.data;
+      unitList.value = unitRes.data;
+      brandList.value = brandRes.data;
+      storeList.value = storeRes.data;
+    })
+    .catch(() => {
+      ElMessage.error('加载数据失败，请稍后重试');
+    });
+}
+
+// 加载商品类型
 function loadTypeList() {
   categoryApi.getCategoryTree()
     .then((response) => {
       typeList.value = response.data;
     })
-    .catch((error) => {
-      console.error('加载商品类型失败:', error);
+    .catch(() => {
       ElMessage.error('加载商品类型失败，请稍后重试');
-    });
-}
-
-// 其他数据加载方法
-function loadSupplyList() {
-  getSupplyList()
-    .then((response) => {
-      supplyList.value = response.data;
-    })
-    .catch((error) => {
-      console.error(error);
-      ElMessage.error('加载供应商失败，请稍后重试');
-    });
-}
-
-function loadPlaceList() {
-  getPlaceList()
-    .then((response) => {
-      placeList.value = response.data;
-    })
-    .catch((error) => {
-      console.error(error);
-      ElMessage.error('加载产地失败，请稍后重试');
-    });
-}
-
-function queryUnitList() {
-  getUnitList()
-    .then((response) => {
-      unitList.value = response.data;
-    })
-    .catch((error) => {
-      console.error(error);
-      ElMessage.error('加载单位失败，请稍后重试');
-    });
-}
-
-function queryBrandList() {
-  getBrandList()
-    .then((response) => {
-      brandList.value = response.data;
-    })
-    .catch((error) => {
-      console.error(error);
-      ElMessage.error('加载品牌失败，请稍后重试');
-    });
-}
-
-function queryStoreList() {
-  getStoreList()
-    .then((response) => {
-      storeList.value = response.data;
-    })
-    .catch((error) => {
-      console.error(error);
-      ElMessage.error('加载门店失败，请稍后重试');
     });
 }
 
 // 加载商品列表
 function loadItemList(pageNum = 1) {
-  getItemList(pageNum, 10)
+  itemApi.getItemList(pageNum, 10)
     .then((response) => {
       itemList.value = response.data;
-      total.value = response.data.length * 10; // 临时处理，后端应该返回总数
+      total.value = response.data.length * 10;
     })
-    .catch((error) => {
-      console.error(error);
+    .catch(() => {
       ElMessage.error('加载商品列表失败');
     });
 }
@@ -527,17 +424,16 @@ function handleDeleteItem(id) {
     type: 'warning',
   })
     .then(() => {
-      deleteItem(id)
+      itemApi.deleteItem(id)
         .then((response) => {
           if (response.data.code === 200) {
             ElMessage.success(response.data.message || '删除成功');
-            loadItemList(1); // 刷新列表
+            loadItemList(1);
           } else {
             ElMessage.error(response.data.message || '删除失败');
           }
         })
-        .catch((error) => {
-          console.error(error);
+        .catch(() => {
           ElMessage.error('删除失败');
         });
     })
@@ -549,7 +445,6 @@ function handleDeleteItem(id) {
 // 打开修改对话框
 function openUpdateDialog(row) {
   dialogItemVisible.value = true;
-  // 填充表单数据
   Object.assign(itemForm, {
     id: row.id,
     itemNum: row.itemNum || '',
@@ -573,26 +468,14 @@ function openUpdateDialog(row) {
     imgs: row.imgs || [],
     createBy: row.createBy || ''
   });
-  
-  // 更新图片列表
-  fileList.value = (row.imgs || []).map(url => ({
-    url,
-    status: 'success'
-  }));
-  selectedTypeName.value = row.typeName || ''; // 假设后端返回了类型名称
-  
-  // 加载相关数据
-  loadTypeList();
-  loadSupplyList();
-  loadPlaceList();
-  queryUnitList();
-  queryBrandList();
-  queryStoreList();
+  fileList.value = (row.imgs || []).map(url => ({ url, status: 'success' }));
+  selectedTypeName.value = row.typeName || '';
+  loadAllData();
 }
 
-// --- 生命周期钩子 ---
+// 生命周期钩子
 onMounted(() => {
-  loadItemList(1); // 初始加载第一页数据
+  loadItemList(1);
 });
 
 // 处理分页
