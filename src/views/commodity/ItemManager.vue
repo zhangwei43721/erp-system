@@ -3,6 +3,59 @@
   <div style="text-align: left; margin-bottom: 20px;">
     <el-button type="primary" @click="openItemDialog">添加商品</el-button>
   </div>
+
+  <!-- 商品列表表格 -->
+  <el-table :data="itemList" stripe style="width: 100%">
+    <el-table-column label="商品图片" width="150">
+      <template #default="{ row }">
+        <div v-if="row.imgs && row.imgs.length" class="image-preview">
+          <el-image
+            v-for="(img, index) in row.imgs"
+            :key="index"
+            :src="img"
+            :preview-src-list="row.imgs"
+            :initial-index="index"
+            :preview-teleported="true"
+            :z-index="3000"
+            fit="cover"
+            class="table-image"
+            style="width: 50px; height: 50px; margin-right: 4px"
+          />
+        </div>
+        <span v-else>无图片</span>
+      </template>
+    </el-table-column>
+    <el-table-column prop="itemNum" label="商品编号" />
+    <el-table-column prop="itemName" label="商品名称" />
+    <el-table-column prop="store" label="库存数量" />
+    <el-table-column prop="price" label="进货价格" />
+    <el-table-column prop="sellPrice" label="销售价格" />
+    <el-table-column prop="vipPrice" label="会员价格" />
+    <el-table-column prop="statue" label="商品状态">
+      <template #default="{ row }">
+        {{ row.statue === 1 ? '上架' : '下架' }}
+      </template>
+    </el-table-column>
+    <el-table-column fixed="right" label="操作" width="150">
+      <template #default="{ row }">
+        <el-button link type="primary" size="small" @click="deleteItem(row.id)">删除</el-button>
+        <el-button link type="primary" size="small" @click="openUpdateDialog(row)">修改</el-button>
+      </template>
+    </el-table-column>
+  </el-table>
+
+  <!-- 分页器 -->
+  <el-pagination
+    size="small"
+    background
+    :page-size="10"
+    :pager-count="5"
+    layout="prev, pager, next"
+    :total="total"
+    class="mt-4"
+    @current-change="handlePageChange"
+  />
+
   <!-- 添加商品信息的对话框 -->
   <el-dialog v-model="dialogItemVisible" title="添加商品" :width="dialogWidth">
     <div style="margin-bottom: 20px;">
@@ -13,18 +66,12 @@
         :auto-upload="true"
         method="post"
         :on-success="handleAvatarSuccess"
+        :on-remove="handleRemove"
+        :on-preview="handlePictureCardPreview"
+        :file-list="fileList"
+        :preview-teleported="true"
       >
         <el-icon><Plus /></el-icon>
-        <template #file="{ file }">
-          <div>
-            <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
-            <span class="el-upload-list__item-actions">
-              <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
-                <el-icon><ZoomIn /></el-icon>
-              </span>
-            </span>
-          </div>
-        </template>
       </el-upload>
     </div>
     <el-form :model="itemForm" :rules="itemRules" label-width="120px" ref="itemFormRef">
@@ -169,25 +216,34 @@
     </template>
   </el-dialog>
   <!-- 图片预览的对话框 -->
-  <el-dialog v-model="dialogVisible" title="图片预览" :width="dialogWidth">
-    <img style="width: 100%;" :src="dialogImageUrl" alt="Preview Image" />
-  </el-dialog>
+  <el-image-viewer
+    v-if="dialogVisible"
+    :url-list="[dialogImageUrl]"
+    :z-index="3000"
+    teleported
+    @close="dialogVisible = false"
+  />
 </template>
 
 <script setup>
-import { reactive, ref, computed } from "vue";
-import { Plus, ZoomIn } from '@element-plus/icons-vue';
-import axios from "axios";
-import { ElMessage } from "element-plus";
+import { reactive, ref, computed, onMounted } from "vue";
+import { Plus } from '@element-plus/icons-vue';
+import { ElMessage, ElMessageBox, ElImageViewer } from "element-plus";
 import { categoryApi } from "@/api/category";
+import axios from '@/api/config';
 
-// 对话框状态
+// 对话框状态和图片上传相关
 const dialogItemVisible = ref(false);
 const dialogTypeVisible = ref(false);
 const dialogVisible = ref(false);
-const dialogImageUrl = ref(null);
+const dialogImageUrl = ref('')
 const itemFormRef = ref(null);
 const typeTreeRef = ref(null);
+const fileList = ref([]);
+
+// 列表数据
+const itemList = ref([]); // 商品列表数据
+const total = ref(0);     // 总记录数
 
 // 响应式对话框宽度
 const dialogWidth = computed(() => {
@@ -306,28 +362,48 @@ function handleAvatarSuccess(response) {
       itemForm.imgs = [];
     }
     itemForm.imgs.push(imageUrl);
+    // 更新fileList
+    fileList.value.push({
+      url: imageUrl,
+      status: 'success'
+    });
     console.log('保存的图片地址列表：', itemForm.imgs);
   }
 }
 
+// 移除图片
+function handleRemove(file) {
+  const index = fileList.value.indexOf(file);
+  if (index !== -1) {
+    fileList.value.splice(index, 1);
+    itemForm.imgs.splice(index, 1);
+  }
+}
+
 // 图片预览
-function handlePictureCardPreview(file) {
-  dialogImageUrl.value = file.url;
-  dialogVisible.value = true;
+const handlePictureCardPreview = (uploadFile) => {
+  dialogImageUrl.value = uploadFile.url
+  dialogVisible.value = true
 }
 
 // 提交表单
 function submitItem() {
   itemFormRef.value.validate((valid) => {
     if (valid) {
-      axios.post("http://localhost:8080/saveItem", itemForm)
-        .then((response) => {
+      const url = itemForm.id ? "http://localhost:8080/updateItem" : "http://localhost:8080/saveItem";
+      const method = itemForm.id ? "put" : "post";
+      
+      axios({
+        url,
+        method,
+        data: itemForm
+      }).then((response) => {
           // 检查响应状态
           if (response.data && response.data.code === 500) {
-            ElMessage.error(response.data.message || '保存失败，请稍后重试');
+            ElMessage.error(response.data.message || '操作失败，请稍后重试');
             return;
           }
-          ElMessage.success('保存成功');
+          ElMessage.success(itemForm.id ? '修改成功' : '添加成功');
           dialogItemVisible.value = false;
           // 清空表单
           Object.assign(itemForm, {
@@ -337,6 +413,10 @@ function submitItem() {
             hotTitle: '', facturer: '', statue: 1, imgs: [], createBy: ''
           });
           selectedTypeName.value = '';
+          // 清空图片列表
+          fileList.value = [];
+          // 刷新商品列表
+          loadItemList(1);
         })
         .catch((error) => {
           console.error(error);
@@ -415,6 +495,100 @@ function queryStoreList() {
       ElMessage.error('加载门店失败，请稍后重试');
     });
 }
+
+// 加载商品列表
+function loadItemList(pageNum = 1) {
+  axios.get(`http://localhost:8080/listItems?pageNum=${pageNum}&pageSize=10`)
+    .then((response) => {
+      itemList.value = response.data;
+      total.value = response.data.length * 10; // 临时处理，后端应该返回总数
+    })
+    .catch((error) => {
+      console.error(error);
+      ElMessage.error('加载商品列表失败');
+    });
+}
+
+// 删除商品
+function deleteItem(id) {
+  ElMessageBox.confirm('确定要删除这个商品吗？', '提示', {
+    confirmButtonText: '确定',
+    cancelButtonText: '取消',
+    type: 'warning',
+  })
+    .then(() => {
+      axios.delete(`http://localhost:8080/deleteItem/${id}`)
+        .then((response) => {
+          if (response.data.code === 200) {
+            ElMessage.success(response.data.message || '删除成功');
+            loadItemList(1); // 刷新列表
+          } else {
+            ElMessage.error(response.data.message || '删除失败');
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+          ElMessage.error('删除失败');
+        });
+    })
+    .catch(() => {
+      ElMessage.info('已取消删除');
+    });
+}
+
+// 打开修改对话框
+function openUpdateDialog(row) {
+  dialogItemVisible.value = true;
+  // 填充表单数据
+  Object.assign(itemForm, {
+    id: row.id,
+    itemNum: row.itemNum || '',
+    itemName: row.itemName || '',
+    typeId: row.typeId,
+    store: row.store || 0,
+    brandId: row.brandId,
+    storeId: row.storeId,
+    supplyId: row.supplyId,
+    placeId: row.placeId,
+    unitId: row.unitId,
+    price: row.price || 0,
+    sellPrice: row.sellPrice || 0,
+    vipPrice: row.vipPrice || 0,
+    itemDesc: row.itemDesc || '',
+    itemDate: row.itemDate,
+    endDate: row.endDate,
+    hotTitle: row.hotTitle || '',
+    facturer: row.facturer || '',
+    statue: row.statue,
+    imgs: row.imgs || [],
+    createBy: row.createBy || ''
+  });
+  
+  // 更新图片列表
+  fileList.value = (row.imgs || []).map(url => ({
+    url,
+    status: 'success'
+  }));
+  selectedTypeName.value = row.typeName || ''; // 假设后端返回了类型名称
+  
+  // 加载相关数据
+  loadTypeList();
+  loadSupplyList();
+  loadPlaceList();
+  queryUnitList();
+  queryBrandList();
+  queryStoreList();
+}
+
+// --- 生命周期钩子 ---
+onMounted(() => {
+  loadItemList(1); // 初始加载第一页数据
+});
+
+// 处理分页
+function handlePageChange(value) {
+  loadItemList(value);
+}
 </script>
 
 <style scoped>
@@ -428,6 +602,26 @@ function queryStoreList() {
   width: 100px;
   height: 100px;
 }
+
+/* 图片预览样式 */
+:deep(.el-dialog) {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+:deep(.el-dialog__body) {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
 @media (max-width: 768px) {
   .el-form-item {
     margin-bottom: 15px;
