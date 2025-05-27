@@ -11,6 +11,7 @@ import RolerManager from "@/views/Sys_Manage/RolerManager.vue";
 import UserManager from "@/views/Sys_Manage/UserManager.vue";
 import StockStatistics from "@/views/statistics/StockStatistics.vue";
 import CategoryManager from "@/views/commodity/CategoryManager.vue";
+import ItemManager from "./views/commodity/ItemManager.vue";
 
 import emitter from "@/eventBus";
 
@@ -38,6 +39,7 @@ const viewComponents = {
   userManager: markRaw(UserManager),
   stockStatistics: markRaw(StockStatistics),
   categoryManager: markRaw(CategoryManager),
+  itemManager: markRaw(ItemManager),
 };
 
 const views = [
@@ -52,10 +54,10 @@ const views = [
   viewComponents.addMenus,
   viewComponents.userManager,
   viewComponents.rolerManager,
-  ,
-  viewComponents.categoryManager
-  ,
-  ,
+  viewComponents.categoryManager,
+  viewComponents.categoryManager,
+  viewComponents.itemManager,
+  viewComponents.categoryManager,
 ];
 
 const currentComponent = shallowRef(null); // 修改初始值，等待 onMounted 中恢复或设置
