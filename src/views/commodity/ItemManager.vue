@@ -38,7 +38,7 @@
     </el-table-column>
     <el-table-column fixed="right" label="操作" width="150">
       <template #default="{ row }">
-        <el-button link type="primary" size="small" @click="deleteItem(row.id)">删除</el-button>
+        <el-button link type="primary" size="small" @click="handleDeleteItem(row.id)">删除</el-button>
         <el-button link type="primary" size="small" @click="openUpdateDialog(row)">修改</el-button>
       </template>
     </el-table-column>
@@ -61,14 +61,15 @@
     <div style="margin-bottom: 20px;">
       <span>商品图片:</span>
       <el-upload
-        action="http://localhost:8080/uploadImg"
+        :action="uploadImageUrl"
         list-type="picture-card"
         :auto-upload="true"
         method="post"
         :on-success="handleAvatarSuccess"
         :on-remove="handleRemove"
-        :on-preview="handlePictureCardPreview"
         :file-list="fileList"
+        :on-preview="handlePictureCardPreview"
+        preview-teleported
       >
         <el-icon><Plus /></el-icon>
       </el-upload>
@@ -214,26 +215,37 @@
       <el-button type="primary" @click="confirmTypeSelection">确认</el-button>
     </template>
   </el-dialog>
-  <!-- 图片预览的对话框 -->
-  <el-dialog 
-    v-model="dialogVisible" 
-    title="图片预览" 
-    :width="dialogWidth"
-    :modal="true"
-    append-to-body
-    :z-index="2000"  
-    destroy-on-close
-  >
-    <img style="width: 100%; max-height: 80vh; object-fit: contain;" :src="dialogImageUrl" alt="Preview Image" />
-  </el-dialog>
+    <!-- 图片预览组件 -->
+  <el-image-viewer
+    v-if="dialogVisible"
+    :url-list="[dialogImageUrl]"
+    :initial-index="0"
+    :hide-on-click-modal="false"
+    :zoom-rate="1.2"
+    :teleported="true"
+    :z-index="3000"
+    @close="dialogVisible = false"
+  />
+  
 </template>
 
 <script setup>
 import { reactive, ref, computed, onMounted } from "vue";
-import { Plus, ZoomIn } from '@element-plus/icons-vue';
-import axios from "axios";
+import { Plus } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from "element-plus";
 import { categoryApi } from "@/api/category";
+import { 
+  getItemList, 
+  saveItem, 
+  updateItem, 
+  deleteItem,
+  getSupplyList,
+  getPlaceList,
+  getUnitList,
+  getBrandList,
+  getStoreList,
+  uploadImageUrl
+} from "@/api/item";
 
 // 对话框状态和图片上传相关
 const dialogItemVisible = ref(false);
@@ -393,14 +405,9 @@ const handlePictureCardPreview = (uploadFile) => {
 function submitItem() {
   itemFormRef.value.validate((valid) => {
     if (valid) {
-      const url = itemForm.id ? "http://localhost:8080/updateItem" : "http://localhost:8080/saveItem";
-      const method = itemForm.id ? "put" : "post";
+      const apiCall = itemForm.id ? updateItem(itemForm) : saveItem(itemForm);
       
-      axios({
-        url,
-        method,
-        data: itemForm
-      }).then((response) => {
+      apiCall.then((response) => {
           // 检查响应状态
           if (response.data && response.data.code === 500) {
             ElMessage.error(response.data.message || '操作失败，请稍后重试');
@@ -445,7 +452,7 @@ function loadTypeList() {
 
 // 其他数据加载方法
 function loadSupplyList() {
-  axios.get("http://localhost:8080/supplyList")
+  getSupplyList()
     .then((response) => {
       supplyList.value = response.data;
     })
@@ -456,7 +463,7 @@ function loadSupplyList() {
 }
 
 function loadPlaceList() {
-  axios.get("http://localhost:8080/placeList")
+  getPlaceList()
     .then((response) => {
       placeList.value = response.data;
     })
@@ -467,7 +474,7 @@ function loadPlaceList() {
 }
 
 function queryUnitList() {
-  axios.get("http://localhost:8080/unitList")
+  getUnitList()
     .then((response) => {
       unitList.value = response.data;
     })
@@ -478,7 +485,7 @@ function queryUnitList() {
 }
 
 function queryBrandList() {
-  axios.get("http://localhost:8080/brandList")
+  getBrandList()
     .then((response) => {
       brandList.value = response.data;
     })
@@ -489,7 +496,7 @@ function queryBrandList() {
 }
 
 function queryStoreList() {
-  axios.get("http://localhost:8080/storeList")
+  getStoreList()
     .then((response) => {
       storeList.value = response.data;
     })
@@ -501,7 +508,7 @@ function queryStoreList() {
 
 // 加载商品列表
 function loadItemList(pageNum = 1) {
-  axios.get(`http://localhost:8080/listItems?pageNum=${pageNum}&pageSize=10`)
+  getItemList(pageNum, 10)
     .then((response) => {
       itemList.value = response.data;
       total.value = response.data.length * 10; // 临时处理，后端应该返回总数
@@ -513,14 +520,14 @@ function loadItemList(pageNum = 1) {
 }
 
 // 删除商品
-function deleteItem(id) {
+function handleDeleteItem(id) {
   ElMessageBox.confirm('确定要删除这个商品吗？', '提示', {
     confirmButtonText: '确定',
     cancelButtonText: '取消',
     type: 'warning',
   })
     .then(() => {
-      axios.delete(`http://localhost:8080/deleteItem/${id}`)
+      deleteItem(id)
         .then((response) => {
           if (response.data.code === 200) {
             ElMessage.success(response.data.message || '删除成功');
@@ -594,73 +601,4 @@ function handlePageChange(value) {
 }
 </script>
 
-<style scoped>
-.item-management {
-  padding: 20px;
-}
-
-.action-bar {
-  margin-bottom: 20px;
-}
-
-.image-container {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.table-image {
-  width: 40px;
-  height: 40px;
-  border-radius: 4px;
-}
-
-.more-images {
-  font-size: 12px;
-  color: #909399;
-}
-
-.no-image {
-  color: #c0c4cc;
-  font-size: 12px;
-}
-
-.pagination {
-  margin-top: 20px;
-  justify-content: center;
-}
-
-.upload-section {
-  margin-bottom: 20px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.item-form :deep(.el-form-item) {
-  margin-bottom: 16px;
-}
-
-.item-form :deep(.el-select),
-.item-form :deep(.el-date-picker) {
-  width: 100%;
-}
-
-@media (max-width: 768px) {
-  .item-management {
-    padding: 10px;
-  }
-  
-  .item-form :deep(.el-col) {
-    width: 100% !important;
-  }
-  
-  .table-image {
-    width: 30px;
-    height: 30px;
-  }
-}
-</style>
+<style scoped></style>
