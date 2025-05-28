@@ -59,8 +59,8 @@
     <el-table-column label="销售价格" prop="sellPrice"/>
     <el-table-column label="状态" prop="statue" width="80">
       <template #default="{ row }">
-        <el-tag :type="row.statue === 1 ? 'success' : 'danger'">
-          {{ row.statue === 1 ? '上架' : '下架' }}
+        <el-tag :type="row.statue === 0 ? 'success' : 'danger'">
+          {{ row.statue === 0 ? '上架' : '下架' }}
         </el-tag>
       </template>
     </el-table-column>
@@ -68,6 +68,8 @@
       <template #default="{ row }">
         <el-button link size="small" type="primary" @click="handleDeleteItem(row.id)">删除</el-button>
         <el-button link size="small" type="primary" @click="openUpdateDialog(row)">修改</el-button>
+        <el-button v-if="row.statue === 1" link size="small" type="success" @click="handleUpItem(row.id)">上架</el-button>
+        <el-button v-if="row.statue === 0" link size="small" type="warning" @click="handleDownItem(row.id)">下架</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -559,6 +561,38 @@ function handleDeleteItem(id) {
       .catch(() => {
         ElMessage.info('已取消删除');
       });
+}
+
+// 处理商品下架
+function handleDownItem(id) {
+  itemApi.downItem(id)
+    .then((response) => {
+      if (response.data.code === 200) {
+        ElMessage.success(response.data.message || '下架成功');
+        loadItemList(1);
+      } else {
+        ElMessage.error(response.data.message || '下架失败');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('下架失败');
+    });
+}
+
+// 处理商品上架
+function handleUpItem(id) {
+  itemApi.upItem(id)
+    .then((response) => {
+      if (response.data.code === 200) {
+        ElMessage.success(response.data.message || '上架成功');
+        loadItemList(1);
+      } else {
+        ElMessage.error(response.data.message || '上架失败');
+      }
+    })
+    .catch(() => {
+      ElMessage.error('上架失败');
+    });
 }
 
 // 打开修改对话框

@@ -26,6 +26,16 @@ export const itemApi = {
         return request.delete(`/deleteItem/${id}`)
     },
 
+    // 商品下架
+    downItem(id) {
+        return request.get(`/downItem/${id}`)
+    },
+
+    // 商品上架
+    upItem(id) {
+        return request.get(`/upItem/${id}`)
+    },
+
     // 获取供应商列表
     getSupplyList() {
         return request.get('/supplyList')
