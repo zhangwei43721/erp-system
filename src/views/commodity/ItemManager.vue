@@ -1,7 +1,25 @@
 <template>
   <h2>商品信息</h2>
-  <div style="text-align: left; margin-bottom: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
     <el-button type="primary" @click="openItemDialog">添加商品</el-button>
+    <el-form :inline="true" :model="searchForm" class="search-form" ref="searchFormRef">
+      <el-form-item label="商品编号" prop="itemNum">
+        <el-input v-model="searchForm.itemNum" placeholder="请输入商品编号" clearable/>
+      </el-form-item>
+      <el-form-item label="商品名称" prop="itemName">
+        <el-input v-model="searchForm.itemName" placeholder="请输入商品名称" clearable/>
+      </el-form-item>
+      <el-form-item label="状态" prop="statue">
+        <el-select v-model="searchForm.statue" placeholder="请选择" clearable style="width: 100px;">
+          <el-option label="上架" :value="1" />
+          <el-option label="下架" :value="0" />
+        </el-select>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" @click="handleSearch">查询</el-button>
+        <el-button @click="resetSearchForm">重置</el-button>
+      </el-form-item>
+    </el-form>
   </div>
 
   <!-- 商品列表表格 -->
@@ -223,6 +241,7 @@ const dialogVisible = ref(false);
 const dialogImageUrl = ref('');
 const itemFormRef = ref(null);
 const typeTreeRef = ref(null);
+const searchFormRef = ref(null); // 新增: 查询表单引用
 const fileList = ref([]);
 
 // 列表数据
@@ -241,7 +260,14 @@ const typeTreeConfig = {
   children: 'children'
 };
 
-// 表单数据
+// 查询表单数据
+const searchForm = reactive({
+  itemNum: '',
+  itemName: '',
+  statue: null,
+});
+
+// 商品表单数据
 const itemForm = reactive({
   itemNum: '',
   itemName: '',
@@ -466,8 +492,15 @@ function loadTypeList() {
 }
 
 // 加载商品列表
-function loadItemList(pageNum = 1) {
-  itemApi.getItemList(pageNum, 10)
+function loadItemList(pageNum = 1, pageSize = 10) {
+  const params = {
+    pageNum,
+    pageSize,
+    itemNum: searchForm.itemNum,
+    itemName: searchForm.itemName,
+    statue: searchForm.statue,
+  };
+  itemApi.getItemList(params)
       .then((response) => {
         // 确保从后端正确解析数据
         if (response.data && response.data.items) {
@@ -483,6 +516,23 @@ function loadItemList(pageNum = 1) {
       .catch(() => {
         ElMessage.error('加载商品列表失败');
       });
+}
+
+// 处理查询
+function handleSearch() {
+  loadItemList(1); // 查询时总是从第一页开始
+}
+
+// 重置查询表单
+function resetSearchForm() {
+  if (searchFormRef.value) {
+    searchFormRef.value.resetFields();
+  }
+  // 手动清空searchForm reactive对象的值，因为resetFields可能不会完全清空
+  searchForm.itemNum = '';
+  searchForm.itemName = '';
+  searchForm.statue = null;
+  loadItemList(1); // 重置后重新加载数据
 }
 
 // 删除商品

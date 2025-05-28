@@ -2,9 +2,8 @@ import request from './config'
 
 // 商品管理相关接口
 export const itemApi = {
-    // 获取商品列表
-    getItemList(pageNum, pageSize = 10) {
-        return request.get(`/listItems?pageNum=${pageNum}&pageSize=${pageSize}`)
+    getItemList(itemCond) {
+        return request.post('/itemList', itemCond)
     },
 
     // 获取商品编号
