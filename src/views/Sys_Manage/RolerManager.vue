@@ -4,7 +4,7 @@
     <el-button type="primary" @click="openRoleDialog">添加角色</el-button>
   </div>
   <el-table :data="rolerList" stripe style="width: 100%">
-    <el-table-column prop="id" label="编号" width="180" />
+    <el-table-column label="编号" prop="id" width="180"/>
     <el-table-column label="角色" width="260">
       <template #default="scope">
         <el-input v-if="scope.row.edit" v-model="scope.row.rname"></el-input>
@@ -31,9 +31,9 @@
     </el-table-column>
   </el-table>
   <!-- 分页组件 -->
-  <hr />
-  <el-pagination size="small" background :page-size="10" :pager-count="7" layout="prev, pager, next" :total="total"
-    class="mt-4" @current-change="rolerPageChange" />
+  <hr/>
+  <el-pagination :page-size="10" :pager-count="7" :total="total" background class="mt-4" layout="prev, pager, next"
+                 size="small" @current-change="rolerPageChange"/>
   <!-- 角色信息对话框 -->
   <!-- 回显客户信息的对话框 -->
   <el-dialog v-model="dialogRoleVisible" width="80%">
@@ -42,10 +42,10 @@
     <!-- 对话框中添加form -->
     <el-form :model="rolerForm" label-width="120px">
       <el-form-item label="角色名称">
-        <el-input v-model="rolerForm.rname" style="width: 80%" />
+        <el-input v-model="rolerForm.rname" style="width: 80%"/>
       </el-form-item>
       <el-form-item label="角色描述">
-        <el-input v-model="rolerForm.rdesc" style="width: 80%" />
+        <el-input v-model="rolerForm.rdesc" style="width: 80%"/>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="saveRoleForm">保存</el-button>
@@ -55,17 +55,17 @@
 
   </el-dialog>
   <!--授权对话框-->
-  <el-dialog title="角色授权" v-model="authDialogVisible" width="40%">
+  <el-dialog v-model="authDialogVisible" title="角色授权" width="40%">
     <div style="text-align: left">
       <h4>请选择该角色可访问的菜单</h4>
       <el-tree
-        :props="props"
-        :data="treeNodeList"
-        node-key="id"
-        show-checkbox
-        default-expand-all
-        ref="treeRef"
-        :highlight-current="true"
+          ref="treeRef"
+          :data="treeNodeList"
+          :highlight-current="true"
+          :props="props"
+          default-expand-all
+          node-key="id"
+          show-checkbox
       >
         <template #default="{ node, data }">
           <span class="custom-tree-node">
@@ -83,9 +83,9 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
-import { roleApi } from "@/api/role";
+import {onMounted, reactive, ref} from "vue";
+import {ElMessage, ElMessageBox} from "element-plus";
+import {roleApi} from "@/api/role";
 //定义角色集合列表数据
 const rolerList = ref([]);
 const total = ref(0);
@@ -106,14 +106,15 @@ const currentRoleName = ref('');
 //发送请求加载角色列表
 function queryRoleList(pageNum) {
   roleApi.getRoleList(pageNum)
-    .then((response) => {
-      rolerList.value = response.data.rolerList;
-      total.value = response.data.total;
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then((response) => {
+        rolerList.value = response.data.rolerList;
+        total.value = response.data.total;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 }
+
 //加载页码调用函数
 onMounted(function () {
   queryRoleList(1);
@@ -123,23 +124,25 @@ onMounted(function () {
 function rolerPageChange(pageNum) {
   queryRoleList(pageNum);
 }
+
 //定义函数实现表格编辑效果
 function handleEdit(row) {
   row.edit = true;
 }
+
 //定义函数实现编辑后保存
 function handleSave(row) {
   //发送ajax请求进行数据更新
   roleApi.updateRole(row)
-    .then((response) => {
-      if (response.data.code == 200) {
-        row.edit = false;
-      }
-      ElMessage(response.data.message);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+      .then((response) => {
+        if (response.data.code === 200) {
+          row.edit = false;
+        }
+        ElMessage(response.data.message);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
 }
 
 // 处理授权按钮点击事件
@@ -154,49 +157,49 @@ function handleAuthorize(row) {
 // 加载菜单树
 function loadMenuTree() {
   roleApi.getMenuTree()
-    .then((response) => {
-      treeNodeList.value = response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-      ElMessage.error("菜单加载失败");
-    });
+      .then((response) => {
+        treeNodeList.value = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        ElMessage.error("菜单加载失败");
+      });
 }
 
 // 加载角色已有的菜单权限
 function loadRoleMenus(roleId) {
   roleApi.getRoleMenus(roleId)
-    .then((response) => {
-      // 等待树加载完成后再设置选中状态
-      setTimeout(() => {
-        if (treeRef.value) {
-          // 清除之前的选择
-          treeRef.value.setCheckedKeys([]);
-          // 设置新的选中项
-          if (response.data && response.data.length > 0) {
-            // 先找出只包含叶子节点的ID
-            const leafNodeIds = filterLeafNodeIds(response.data, treeNodeList.value);
-            // 只选中叶子节点，父节点会自动变为半选中状态
-            treeRef.value.setCheckedKeys(leafNodeIds);
+      .then((response) => {
+        // 等待树加载完成后再设置选中状态
+        setTimeout(() => {
+          if (treeRef.value) {
+            // 清除之前的选择
+            treeRef.value.setCheckedKeys([]);
+            // 设置新的选中项
+            if (response.data && response.data.length > 0) {
+              // 先找出只包含叶子节点的ID
+              const leafNodeIds = filterLeafNodeIds(response.data, treeNodeList.value);
+              // 只选中叶子节点，父节点会自动变为半选中状态
+              treeRef.value.setCheckedKeys(leafNodeIds);
+            }
           }
-        }
-      }, 100);
-    })
-    .catch((error) => {
-      console.log(error);
-      ElMessage.error("角色菜单权限加载失败");
-    });
+        }, 100);
+      })
+      .catch((error) => {
+        console.log(error);
+        ElMessage.error("角色菜单权限加载失败");
+      });
 }
 
 // 递归检查节点ID是否为叶子节点，并过滤出叶子节点ID
 function filterLeafNodeIds(ids, nodes) {
   // 存储所有非叶子节点的ID
   const parentIds = new Set();
-  
+
   // 递归收集所有非叶子节点ID
   function collectParentIds(nodeList) {
     if (!nodeList || nodeList.length === 0) return;
-    
+
     for (const node of nodeList) {
       if (node.subMenu && node.subMenu.length > 0) {
         // 这是一个父节点
@@ -206,10 +209,10 @@ function filterLeafNodeIds(ids, nodes) {
       }
     }
   }
-  
+
   // 收集所有父节点ID
   collectParentIds(nodes);
-  
+
   // 过滤出只有叶子节点的ID
   return ids.filter(id => !parentIds.has(id));
 }
@@ -226,20 +229,20 @@ function saveRoleAuth() {
   nodes.forEach((item) => {
     arr.push(item.id);
   });
-  
+
   roleApi.grantRoleMenus(arr)
-    .then((response) => {
-      if (response.data.code === 200) {
-        ElMessage.success("授权成功");
-        authDialogVisible.value = false;
-      } else {
-        ElMessage.error(response.data.message || "授权失败");
-      }
-    })
-    .catch((error) => {
-      console.log(error);
-      ElMessage.error("授权失败，请稍后重试");
-    });
+      .then((response) => {
+        if (response.data.code === 200) {
+          ElMessage.success("授权成功");
+          authDialogVisible.value = false;
+        } else {
+          ElMessage.error(response.data.message || "授权失败");
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+        ElMessage.error("授权失败，请稍后重试");
+      });
 }
 
 //定义函数实现删除角色
@@ -250,16 +253,16 @@ function handleDelete(row) {
     type: 'warning',
   }).then(() => {
     roleApi.deleteRole(row)
-      .then((response) => {
-        if (response.data.code == 200) {
-          queryRoleList(1);
-        }
-        ElMessage(response.data.message);
-      })
-      .catch((error) => {
-        console.log(error);
-        ElMessage("删除失败，请稍后重试");
-      });
+        .then((response) => {
+          if (response.data.code === 200) {
+            queryRoleList(1);
+          }
+          ElMessage(response.data.message);
+        })
+        .catch((error) => {
+          console.log(error);
+          ElMessage("删除失败，请稍后重试");
+        });
   }).catch(() => {
     ElMessage("已取消删除");
   });
@@ -272,25 +275,27 @@ const rolerForm = reactive({
   rname: '',
   rdesc: ''
 });
+
 //定义打开添加角色信息的对话框
 function openRoleDialog() {
   dialogRoleVisible.value = true;
 }
+
 //定义函数提交角色信息保存的ajax请求
 function saveRoleForm() {
   roleApi.saveRole(rolerForm)
-    .then((response) => {
-      if (response.data.code == 200) {
-        dialogRoleVisible.value = false;
-        rolerForm.rname = '';
-        rolerForm.rdesc = '';
-        queryRoleList(1);
-      }
-      ElMessage(response.data.message);
-    })
-    .catch((error) => {
-      console.log(error);
-    })
+      .then((response) => {
+        if (response.data.code === 200) {
+          dialogRoleVisible.value = false;
+          rolerForm.rname = '';
+          rolerForm.rdesc = '';
+          queryRoleList(1);
+        }
+        ElMessage(response.data.message);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
 }
 </script>
 

@@ -2,25 +2,25 @@
   <h2>管理菜单</h2>
   <div style="text-align: left">
     <h4>选择新增节点的父节点（支持拖拽调整顺序）</h4>
-    <el-tree :props="props" :data="treeNodeList" node-key="id" default-expand-all :expand-on-click-node="false"
-      ref="treeRef" @node-click="hanldNodeClick" :highlight-current="true" draggable :allow-drop="allowDrop"
-      :allow-drag="allowDrag" @node-drop="handleDrop">
+    <el-tree ref="treeRef" :allow-drag="allowDrag" :allow-drop="allowDrop" :data="treeNodeList" :expand-on-click-node="false"
+             :highlight-current="true" :props="props" default-expand-all draggable node-key="id"
+             @node-click="hanldNodeClick" @node-drop="handleDrop">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <span>{{ node.label }}</span>
           <span>
-            <a @click.stop="openEditDialog(data)" style="color: var(--el-color-primary)"> 修改 </a>
+            <a style="color: var(--el-color-primary)" @click.stop="openEditDialog(data)"> 修改 </a>
             <a style="margin-left: 8px; color: var(--el-color-danger)" @click.stop="delMenus(node, data)"> 删除 </a>
           </span>
         </span>
       </template>
     </el-tree>
   </div>
-  <hr />
+  <hr/>
   <!-- 添加表单控件 -->
   <el-form :model="menuForm" label-width="120px">
     <el-form-item label="新增菜单名称">
-      <el-input v-model="menuForm.label" style="width: 50%" />
+      <el-input v-model="menuForm.label" style="width: 50%"/>
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="subMenuForm">保存</el-button>
@@ -28,10 +28,10 @@
     </el-form-item>
   </el-form>
   <!-- 修改弹窗 -->
-  <el-dialog title="修改菜单" v-model="dialogVisible" width="30%">
+  <el-dialog v-model="dialogVisible" title="修改菜单" width="30%">
     <el-form :model="editForm" label-width="120px">
       <el-form-item label="菜单名称">
-        <el-input v-model="editForm.label" style="width: 50%" />
+        <el-input v-model="editForm.label" style="width: 50%"/>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -42,10 +42,10 @@
 </template>
 
 <script setup>
-import { onMounted, reactive, ref, nextTick } from "vue";
-import { ElMessage, ElMessageBox } from "element-plus";
+import {nextTick, onMounted, reactive, ref} from "vue";
+import {ElMessage, ElMessageBox} from "element-plus";
 import emitter from "@/eventBus";
-import { menuApi } from "@/api/menu";
+import {menuApi} from "@/api/menu";
 
 const props = {
   label: 'label',
@@ -71,13 +71,13 @@ const editForm = reactive({
 
 function loadMenuTree() {
   menuApi.getMenuTree()
-    .then((response) => {
-      treeNodeList.value = response.data;
-    })
-    .catch((error) => {
-      console.log(error);
-      ElMessage.error("菜单加载失败");
-    });
+      .then((response) => {
+        treeNodeList.value = response.data;
+      })
+      .catch((error) => {
+        console.log(error);
+        ElMessage.error("菜单加载失败");
+      });
 }
 
 onMounted(() => {
@@ -100,21 +100,21 @@ function openEditDialog(data) {
 
 function updateMenu() {
   menuApi.updateMenu(editForm)
-    .then((response) => {
-      if (response.data.code === 200) {
-        loadMenuTree();
-        dialogVisible.value = false;
-        emitter.emit('menu-structure-changed'); // <--- 触发事件
-      }
-      ElMessage({
-        type: response.data.code === 200 ? 'success' : 'error',
-        message: response.data.message || (response.data.code === 200 ? '更新成功' : '更新失败')
+      .then((response) => {
+        if (response.data.code === 200) {
+          loadMenuTree();
+          dialogVisible.value = false;
+          emitter.emit('menu-structure-changed'); // <--- 触发事件
+        }
+        ElMessage({
+          type: response.data.code === 200 ? 'success' : 'error',
+          message: response.data.message || (response.data.code === 200 ? '更新成功' : '更新失败')
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        ElMessage.error('修改失败，请稍后重试');
       });
-    })
-    .catch((error) => {
-      console.log(error);
-      ElMessage.error('修改失败，请稍后重试');
-    });
 }
 
 function resetForm() {
@@ -138,21 +138,21 @@ function subMenuForm() {
   }
   menuForm.pid = currentSelectedPidForAdd;
   menuApi.saveMenu(menuForm)
-    .then((response) => {
-      if (response.data.code === 200) {
-        loadMenuTree();
-        resetForm();
-        emitter.emit('menu-structure-changed'); // <--- 触发事件
-      }
-      ElMessage({
-        type: response.data.code === 200 ? 'success' : 'error',
-        message: response.data.message || (response.data.code === 200 ? '添加成功' : '添加失败')
+      .then((response) => {
+        if (response.data.code === 200) {
+          loadMenuTree();
+          resetForm();
+          emitter.emit('menu-structure-changed'); // <--- 触发事件
+        }
+        ElMessage({
+          type: response.data.code === 200 ? 'success' : 'error',
+          message: response.data.message || (response.data.code === 200 ? '添加成功' : '添加失败')
+        });
+      })
+      .catch((error) => {
+        console.log(error);
+        ElMessage.error('添加失败，请稍后重试');
       });
-    })
-    .catch((error) => {
-      console.log(error);
-      ElMessage.error('添加失败，请稍后重试');
-    });
 }
 
 async function delMenus(node, data) {
@@ -162,16 +162,16 @@ async function delMenus(node, data) {
   }
   try {
     await ElMessageBox.confirm(
-      `确定要删除菜单 "${data.label}" 吗?`,
-      '提示',
-      { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }
+        `确定要删除菜单 "${data.label}" 吗?`,
+        '提示',
+        {confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning'}
     );
     const response = await menuApi.deleteMenu(data.id);
     if (response.data.code === 200) {
       loadMenuTree();
       emitter.emit('menu-structure-changed'); // <--- 触发事件
     }
-    ElMessage({ type: response.data.code === 200 ? 'success' : 'error', message: response.data.message });
+    ElMessage({type: response.data.code === 200 ? 'success' : 'error', message: response.data.message});
   } catch (error) {
     if (error !== 'cancel' && error !== 'close') {
       console.error("删除失败:", error);
@@ -183,7 +183,7 @@ async function delMenus(node, data) {
 }
 
 // --- 拖拽相关方法 ---
-const allowDrag = (draggingNode) => {
+const allowDrag = () => {
   return true;
 };
 
@@ -222,11 +222,8 @@ const allowDrop = (draggingNode, dropNode, type) => {
       if (type === 'inner') {
         // 条件：允许一级节点A放入一级节点B内部，前提是A没有子节点
         // 此时A将从一级降为二级
-        if (draggingNodeHasChildren) {
-          // ElMessage.warning('有子节点的父菜单不能直接成为其他父菜单的子菜单。');
-          return false; // 有子节点的一级不能直接降级并带子节点进入 (避免三级)
-        }
-        return true; // 允许无子节点的一级节点成为另一一级节点的子节点
+        return !draggingNodeHasChildren;
+         // 允许无子节点的一级节点成为另一一级节点的子节点
       }
       return true; // 允许一级节点之间同级排序 (prev/next)
     }
@@ -264,7 +261,7 @@ const allowDrop = (draggingNode, dropNode, type) => {
   return false; // 其他未明确定义的拖拽均不允许
 };
 
-const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
+const handleDrop = async (draggingNode, dropNode, dropType) => {
   if (dropType === 'none') {
     return;
   }
@@ -327,18 +324,6 @@ const handleDrop = async (draggingNode, dropNode, dropType, ev) => {
 </script>
 
 <style scoped>
-::v-deep .el-tree-node.is-current>.el-tree-node__content {
-  background-color: var(--el-color-primary-light-9);
-  color: var(--el-color-primary);
-}
-
-::v-deep .el-tree-node__content:hover {
-  background-color: var(--el-fill-color-light);
-}
-
-::v-deep .el-tree {
-  --el-tree-node-hover-bg-color: var(--el-fill-color-light);
-}
 
 .custom-tree-node {
   flex: 1;

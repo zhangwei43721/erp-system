@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import router from './router'
 
@@ -10,20 +10,20 @@ import 'element-plus/dist/index.css';
 createApp(App).use(ElementPlus).use(router).mount('#app');
 // app.vue写在script里面  main.js写在app挂在完之后
 const debounce = (fn, delay) => {
-  let timer
-  return (...args) => {
-    if (timer) {
-      clearTimeout(timer)
+    let timer
+    return (...args) => {
+        if (timer) {
+            clearTimeout(timer)
+        }
+        timer = setTimeout(() => {
+            fn(...args)
+        }, delay)
     }
-    timer = setTimeout(() => {
-      fn(...args)
-    }, delay)
-  }
 }
 const _ResizeObserver = window.ResizeObserver;
 window.ResizeObserver = class ResizeObserver extends _ResizeObserver {
-  constructor(callback) {
-    callback = debounce(callback, 200);
-    super(callback);
-  }
+    constructor(callback) {
+        callback = debounce(callback, 200);
+        super(callback);
+    }
 }

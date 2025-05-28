@@ -5,15 +5,16 @@
   </div>
 
   <!-- 商品列表表格 -->
-  <el-table :data="itemList" stripe style="width: 100%" row-key="id">
+  <el-table :data="itemList" row-key="id" stripe style="width: 100%">
     <el-table-column type="expand">
       <template #default="{ row }">
         <el-descriptions :column="2" border style="margin: 10px 20px;">
           <el-descriptions-item label="商品图片">
             <div v-if="row.imgs && row.imgs.length" class="image-preview">
-              <el-image v-for="(img, index) in row.imgs" :key="index" :src="img" :preview-src-list="row.imgs"
-                :initial-index="index" :preview-teleported="true" :z-index="3000" fit="cover" class="table-image"
-                style="width: 60px; height: 60px; margin-right: 5px; border-radius: 4px;" />
+              <el-image v-for="(img, index) in row.imgs" :key="index" :initial-index="index" :preview-src-list="row.imgs"
+                        :preview-teleported="true" :src="img" :z-index="3000" class="table-image"
+                        fit="cover"
+                        style="width: 60px; height: 60px; margin-right: 5px; border-radius: 4px;"/>
             </div>
             <span v-else>无图片</span>
           </el-descriptions-item>
@@ -32,13 +33,13 @@
         </el-descriptions>
       </template>
     </el-table-column>
-    <el-table-column prop="itemNum" label="商品编号" />
-    <el-table-column prop="itemName" label="商品名称" />
-    <el-table-column prop="cateName" label="商品类型" />
-    <el-table-column prop="brandName" label="品牌" />
-    <el-table-column prop="store" label="库存" width="80" />
-    <el-table-column prop="sellPrice" label="销售价格" />
-    <el-table-column prop="statue" label="状态" width="80">
+    <el-table-column label="商品编号" prop="itemNum"/>
+    <el-table-column label="商品名称" prop="itemName"/>
+    <el-table-column label="商品类型" prop="cateName"/>
+    <el-table-column label="品牌" prop="brandName"/>
+    <el-table-column label="库存" prop="store" width="80"/>
+    <el-table-column label="销售价格" prop="sellPrice"/>
+    <el-table-column label="状态" prop="statue" width="80">
       <template #default="{ row }">
         <el-tag :type="row.statue === 1 ? 'success' : 'danger'">
           {{ row.statue === 1 ? '上架' : '下架' }}
@@ -47,138 +48,138 @@
     </el-table-column>
     <el-table-column fixed="right" label="操作" width="150">
       <template #default="{ row }">
-        <el-button link type="primary" size="small" @click="handleDeleteItem(row.id)">删除</el-button>
-        <el-button link type="primary" size="small" @click="openUpdateDialog(row)">修改</el-button>
+        <el-button link size="small" type="primary" @click="handleDeleteItem(row.id)">删除</el-button>
+        <el-button link size="small" type="primary" @click="openUpdateDialog(row)">修改</el-button>
       </template>
     </el-table-column>
   </el-table>
 
   <!-- 分页器 -->
-  <el-pagination size="small" background :page-size="10" :pager-count="5" layout="prev, pager, next" :total="total"
-    class="mt-4" @current-change="handlePageChange" />
+  <el-pagination :page-size="10" :pager-count="5" :total="total" background class="mt-4" layout="prev, pager, next"
+                 size="small" @current-change="handlePageChange"/>
 
   <!-- 添加商品对话框 -->
-  <el-dialog v-model="dialogItemVisible" title="添加商品" :width="dialogWidth">
+  <el-dialog v-model="dialogItemVisible" :width="dialogWidth" title="添加商品">
     <div style="margin-bottom: 20px;">
       <span>商品图片:</span>
-      <el-upload :action="uploadImageUrl" list-type="picture-card" :auto-upload="true" method="post"
-        :on-success="handleAvatarSuccess" :on-remove="handleRemove" :file-list="fileList"
-        :on-preview="handlePictureCardPreview" preview-teleported>
+      <el-upload :action="uploadImageUrl" :auto-upload="true" :file-list="fileList" :on-preview="handlePictureCardPreview"
+                 :on-remove="handleRemove" :on-success="handleAvatarSuccess" list-type="picture-card"
+                 method="post" preview-teleported>
         <el-icon>
-          <Plus />
+          <Plus/>
         </el-icon>
       </el-upload>
     </div>
-    <el-form :model="itemForm" :rules="itemRules" label-width="120px" ref="itemFormRef">
+    <el-form ref="itemFormRef" :model="itemForm" :rules="itemRules" label-width="120px">
       <el-row :gutter="20">
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="商品编号" prop="itemNum">
-            <el-input v-model="itemForm.itemNum" />
+            <el-input v-model="itemForm.itemNum"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="商品名称" prop="itemName">
-            <el-input v-model="itemForm.itemName" />
+            <el-input v-model="itemForm.itemName"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="商品类型" prop="typeId">
-            <el-input v-model="selectedTypeName" disabled placeholder="点击选择商品类型" />
-            <el-button type="primary" size="small" style="margin-left: 10px;" @click="openTypeDialog">选择</el-button>
+            <el-input v-model="selectedTypeName" disabled placeholder="点击选择商品类型"/>
+            <el-button size="small" style="margin-left: 10px;" type="primary" @click="openTypeDialog">选择</el-button>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="库存数量" prop="store">
-            <el-input v-model.number="itemForm.store" type="number" />
+            <el-input v-model.number="itemForm.store" type="number"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="品牌" prop="brandId">
             <el-select v-model="itemForm.brandId" placeholder="请选择品牌">
-              <el-option v-for="item in brandList" :key="item.brandId" :label="item.brandName" :value="item.brandId" />
+              <el-option v-for="item in brandList" :key="item.brandId" :label="item.brandName" :value="item.brandId"/>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="门店" prop="storeId">
             <el-select v-model="itemForm.storeId" placeholder="请选择门店">
-              <el-option v-for="item in storeList" :key="item.storeId" :label="item.storeName" :value="item.storeId" />
+              <el-option v-for="item in storeList" :key="item.storeId" :label="item.storeName" :value="item.storeId"/>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="供应商" prop="supplyId">
             <el-select v-model="itemForm.supplyId" placeholder="请选择供应商">
               <el-option v-for="item in supplyList" :key="item.supplyId" :label="item.supplyName"
-                :value="item.supplyId" />
+                         :value="item.supplyId"/>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="产地" prop="placeId">
             <el-select v-model="itemForm.placeId" placeholder="请选择产地">
-              <el-option v-for="item in placeList" :key="item.placeId" :label="item.placeName" :value="item.placeId" />
+              <el-option v-for="item in placeList" :key="item.placeId" :label="item.placeName" :value="item.placeId"/>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="单位" prop="unitId">
             <el-select v-model="itemForm.unitId" placeholder="请选择单位">
-              <el-option v-for="item in unitList" :key="item.unitId" :label="item.unitName" :value="item.unitId" />
+              <el-option v-for="item in unitList" :key="item.unitId" :label="item.unitName" :value="item.unitId"/>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="进货价格" prop="price">
-            <el-input v-model.number="itemForm.price" type="number" />
+            <el-input v-model.number="itemForm.price" type="number"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="销售价格" prop="sellPrice">
-            <el-input v-model.number="itemForm.sellPrice" type="number" />
+            <el-input v-model.number="itemForm.sellPrice" type="number"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="会员价格" prop="vipPrice">
-            <el-input v-model.number="itemForm.vipPrice" type="number" />
+            <el-input v-model.number="itemForm.vipPrice" type="number"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="24" :md="24">
+        <el-col :md="24" :sm="24" :xs="24">
           <el-form-item label="商品描述" prop="itemDesc">
-            <el-input v-model="itemForm.itemDesc" type="textarea" :rows="3" />
+            <el-input v-model="itemForm.itemDesc" :rows="3" type="textarea"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="生产日期" prop="itemDate">
-            <el-date-picker v-model="itemForm.itemDate" type="date" placeholder="选择生产日期" />
+            <el-date-picker v-model="itemForm.itemDate" placeholder="选择生产日期" type="date"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="到期日期" prop="endDate">
-            <el-date-picker v-model="itemForm.endDate" type="date" placeholder="选择到期日期" />
+            <el-date-picker v-model="itemForm.endDate" placeholder="选择到期日期" type="date"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="促销标题" prop="hotTitle">
-            <el-input v-model="itemForm.hotTitle" />
+            <el-input v-model="itemForm.hotTitle"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="制造商" prop="facturer">
-            <el-input v-model="itemForm.facturer" />
+            <el-input v-model="itemForm.facturer"/>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="商品状态" prop="statue">
             <el-select v-model="itemForm.statue" placeholder="请选择状态">
-              <el-option label="上架" :value="1" />
-              <el-option label="下架" :value="0" />
+              <el-option :value="1" label="上架"/>
+              <el-option :value="0" label="下架"/>
             </el-select>
           </el-form-item>
         </el-col>
-        <el-col :xs="24" :sm="12" :md="8">
+        <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="创建者" prop="createBy">
-            <el-input v-model="itemForm.createBy" />
+            <el-input v-model="itemForm.createBy"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -190,9 +191,9 @@
   </el-dialog>
 
   <!-- 商品类型选择对话框 -->
-  <el-dialog v-model="dialogTypeVisible" title="选择商品类型" :width="dialogWidth">
-    <el-tree :props="typeTreeConfig" :data="typeList" default-expand-all node-key="id" ref="typeTreeRef"
-      :highlight-current="true" :expand-on-click-node="false" @node-click="handleTypeNodeClick">
+  <el-dialog v-model="dialogTypeVisible" :width="dialogWidth" title="选择商品类型">
+    <el-tree ref="typeTreeRef" :data="typeList" :expand-on-click-node="false" :highlight-current="true" :props="typeTreeConfig"
+             default-expand-all node-key="id" @node-click="handleTypeNodeClick">
       <template #default="{ node }">
         <span>{{ node.label }}</span>
       </template>
@@ -204,16 +205,16 @@
   </el-dialog>
 
   <!-- 图片预览组件 -->
-  <el-image-viewer v-if="dialogVisible" :url-list="[dialogImageUrl]" :initial-index="0" :hide-on-click-modal="false"
-    :zoom-rate="1.2" :teleported="true" :z-index="3000" @close="dialogVisible = false" />
+  <el-image-viewer v-if="dialogVisible" :hide-on-click-modal="false" :initial-index="0" :teleported="true"
+                   :url-list="[dialogImageUrl]" :z-index="3000" :zoom-rate="1.2" @close="dialogVisible = false"/>
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted, nextTick } from "vue";
-import { Plus } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox } from "element-plus";
-import { categoryApi } from "@/api/category";
-import { itemApi, uploadImageUrl } from "@/api/item";
+import {computed, nextTick, onMounted, reactive, ref} from "vue";
+import {Plus} from '@element-plus/icons-vue';
+import {ElMessage, ElMessageBox} from "element-plus";
+import {categoryApi} from "@/api/category";
+import {itemApi, uploadImageUrl} from "@/api/item";
 
 // 对话框状态和图片上传相关
 const dialogItemVisible = ref(false);
@@ -269,21 +270,21 @@ const selectedTypeName = ref('');
 
 // 表单验证规则
 const itemRules = {
-  itemNum: [{ required: true, message: '请输入商品编号', trigger: 'blur' }],
-  itemName: [{ required: true, message: '请输入商品名称', trigger: 'blur' }],
-  typeId: [{ required: true, message: '请选择商品类型', trigger: 'change' }],
-  store: [{ required: true, message: '请输入库存数量', trigger: 'blur' }],
-  brandId: [{ required: true, message: '请选择品牌', trigger: 'change' }],
-  storeId: [{ required: true, message: '请选择门店', trigger: 'change' }],
-  supplyId: [{ required: true, message: '请选择供应商', trigger: 'change' }],
-  placeId: [{ required: true, message: '请选择产地', trigger: 'change' }],
-  unitId: [{ required: true, message: '请选择单位', trigger: 'change' }],
-  price: [{ required: true, message: '请输入进货价格', trigger: 'blur' }],
-  sellPrice: [{ required: true, message: '请输入销售价格', trigger: 'blur' }],
-  vipPrice: [{ required: true, message: '请输入会员价格', trigger: 'blur' }],
-  itemDate: [{ required: true, message: '请选择生产日期', trigger: 'change' }],
-  endDate: [{ required: true, message: '请选择到期日期', trigger: 'change' }],
-  statue: [{ required: true, message: '请选择商品状态', trigger: 'change' }],
+  itemNum: [{required: true, message: '请输入商品编号', trigger: 'blur'}],
+  itemName: [{required: true, message: '请输入商品名称', trigger: 'blur'}],
+  typeId: [{required: true, message: '请选择商品类型', trigger: 'change'}],
+  store: [{required: true, message: '请输入库存数量', trigger: 'blur'}],
+  brandId: [{required: true, message: '请选择品牌', trigger: 'change'}],
+  storeId: [{required: true, message: '请选择门店', trigger: 'change'}],
+  supplyId: [{required: true, message: '请选择供应商', trigger: 'change'}],
+  placeId: [{required: true, message: '请选择产地', trigger: 'change'}],
+  unitId: [{required: true, message: '请选择单位', trigger: 'change'}],
+  price: [{required: true, message: '请输入进货价格', trigger: 'blur'}],
+  sellPrice: [{required: true, message: '请输入销售价格', trigger: 'blur'}],
+  vipPrice: [{required: true, message: '请输入会员价格', trigger: 'blur'}],
+  itemDate: [{required: true, message: '请选择生产日期', trigger: 'change'}],
+  endDate: [{required: true, message: '请选择到期日期', trigger: 'change'}],
+  statue: [{required: true, message: '请选择商品状态', trigger: 'change'}],
 };
 
 // 列表数据
@@ -331,12 +332,12 @@ function openItemDialog() {
 
   // 获取商品编号
   itemApi.getItemCode()
-    .then(response => {
-      itemForm.itemNum = response.data;
-    })
-    .catch(() => {
-      ElMessage.error('获取商品编号失败');
-    });
+      .then(response => {
+        itemForm.itemNum = response.data;
+      })
+      .catch(() => {
+        ElMessage.error('获取商品编号失败');
+      });
 
   dialogItemVisible.value = true;
   loadAllData(); // 加载下拉框等所需数据
@@ -380,7 +381,7 @@ function handleAvatarSuccess(response) {
   if (imageUrl) {
     if (!Array.isArray(itemForm.imgs)) itemForm.imgs = [];
     itemForm.imgs.push(imageUrl);
-    fileList.value.push({ url: imageUrl, status: 'success' });
+    fileList.value.push({url: imageUrl, status: 'success'});
   }
 }
 
@@ -405,27 +406,27 @@ function submitItem() {
     if (valid) {
       const apiCall = itemForm.id ? itemApi.updateItem(itemForm) : itemApi.saveItem(itemForm);
       apiCall
-        .then((response) => {
-          if (response.data && response.data.code === 500) {
-            ElMessage.error(response.data.message || '操作失败，请稍后重试');
-            return;
-          }
-          ElMessage.success(itemForm.id ? '修改成功' : '添加成功');
-          dialogItemVisible.value = false;
-          Object.assign(itemForm, {
-            itemNum: '', itemName: '', typeId: null, store: 0, brandId: null,
-            storeId: null, supplyId: null, placeId: null, unitId: null, price: 0,
-            sellPrice: 0, vipPrice: 0, itemDesc: '', itemDate: null, endDate: null,
-            hotTitle: '', facturer: '', statue: 1, imgs: [], createBy: ''
+          .then((response) => {
+            if (response.data && response.data.code === 500) {
+              ElMessage.error(response.data.message || '操作失败，请稍后重试');
+              return;
+            }
+            ElMessage.success(itemForm.id ? '修改成功' : '添加成功');
+            dialogItemVisible.value = false;
+            Object.assign(itemForm, {
+              itemNum: '', itemName: '', typeId: null, store: 0, brandId: null,
+              storeId: null, supplyId: null, placeId: null, unitId: null, price: 0,
+              sellPrice: 0, vipPrice: 0, itemDesc: '', itemDate: null, endDate: null,
+              hotTitle: '', facturer: '', statue: 1, imgs: [], createBy: ''
+            });
+            selectedTypeName.value = '';
+            fileList.value = [];
+            loadItemList(1);
+          })
+          .catch((error) => {
+            const errorMsg = error.response?.data?.message || '保存失败，请稍后重试';
+            ElMessage.error(errorMsg);
           });
-          selectedTypeName.value = '';
-          fileList.value = [];
-          loadItemList(1);
-        })
-        .catch((error) => {
-          const errorMsg = error.response?.data?.message || '保存失败，请稍后重试';
-          ElMessage.error(errorMsg);
-        });
     }
   });
 }
@@ -440,48 +441,48 @@ function loadAllData() {
     itemApi.getBrandList(),
     itemApi.getStoreList()
   ])
-    .then(([typeRes, supplyRes, placeRes, unitRes, brandRes, storeRes]) => {
-      typeList.value = typeRes.data;
-      supplyList.value = supplyRes.data;
-      placeList.value = placeRes.data;
-      unitList.value = unitRes.data;
-      brandList.value = brandRes.data;
-      storeList.value = storeRes.data;
-    })
-    .catch(() => {
-      ElMessage.error('加载数据失败，请稍后重试');
-    });
+      .then(([typeRes, supplyRes, placeRes, unitRes, brandRes, storeRes]) => {
+        typeList.value = typeRes.data;
+        supplyList.value = supplyRes.data;
+        placeList.value = placeRes.data;
+        unitList.value = unitRes.data;
+        brandList.value = brandRes.data;
+        storeList.value = storeRes.data;
+      })
+      .catch(() => {
+        ElMessage.error('加载数据失败，请稍后重试');
+      });
 }
 
 // 加载商品类型
 function loadTypeList() {
   categoryApi.getCategoryTree()
-    .then((response) => {
-      typeList.value = response.data;
-    })
-    .catch(() => {
-      ElMessage.error('加载商品类型失败，请稍后重试');
-    });
+      .then((response) => {
+        typeList.value = response.data;
+      })
+      .catch(() => {
+        ElMessage.error('加载商品类型失败，请稍后重试');
+      });
 }
 
 // 加载商品列表
 function loadItemList(pageNum = 1) {
   itemApi.getItemList(pageNum, 10)
-    .then((response) => {
-      // 确保从后端正确解析数据
-      if (response.data && response.data.items) {
-        itemList.value = response.data.items;
-        total.value = response.data.total;
-      } else {
-        // 处理可能的空数据或错误格式
-        itemList.value = [];
-        total.value = 0;
-        ElMessage.warning('商品数据格式不正确或为空');
-      }
-    })
-    .catch(() => {
-      ElMessage.error('加载商品列表失败');
-    });
+      .then((response) => {
+        // 确保从后端正确解析数据
+        if (response.data && response.data.items) {
+          itemList.value = response.data.items;
+          total.value = response.data.total;
+        } else {
+          // 处理可能的空数据或错误格式
+          itemList.value = [];
+          total.value = 0;
+          ElMessage.warning('商品数据格式不正确或为空');
+        }
+      })
+      .catch(() => {
+        ElMessage.error('加载商品列表失败');
+      });
 }
 
 // 删除商品
@@ -491,23 +492,23 @@ function handleDeleteItem(id) {
     cancelButtonText: '取消',
     type: 'warning',
   })
-    .then(() => {
-      itemApi.deleteItem(id)
-        .then((response) => {
-          if (response.data.code === 200) {
-            ElMessage.success(response.data.message || '删除成功');
-            loadItemList(1);
-          } else {
-            ElMessage.error(response.data.message || '删除失败');
-          }
-        })
-        .catch(() => {
-          ElMessage.error('删除失败');
-        });
-    })
-    .catch(() => {
-      ElMessage.info('已取消删除');
-    });
+      .then(() => {
+        itemApi.deleteItem(id)
+            .then((response) => {
+              if (response.data.code === 200) {
+                ElMessage.success(response.data.message || '删除成功');
+                loadItemList(1);
+              } else {
+                ElMessage.error(response.data.message || '删除失败');
+              }
+            })
+            .catch(() => {
+              ElMessage.error('删除失败');
+            });
+      })
+      .catch(() => {
+        ElMessage.info('已取消删除');
+      });
 }
 
 // 打开修改对话框
@@ -536,7 +537,7 @@ function openUpdateDialog(row) {
     imgs: row.imgs || [],
     createBy: row.createBy || ''
   });
-  fileList.value = (row.imgs || []).map(url => ({ url, status: 'success' }));
+  fileList.value = (row.imgs || []).map(url => ({url, status: 'success'}));
   selectedTypeName.value = row.cateName || ''; // 使用 cateName 对应后端的商品类型名称
   loadAllData();
 }
