@@ -5,26 +5,44 @@
   </div>
 
   <!-- 商品列表表格 -->
-  <el-table :data="itemList" stripe style="width: 100%">
-    <el-table-column label="商品图片" width="150">
+  <el-table :data="itemList" stripe style="width: 100%" row-key="id">
+    <el-table-column type="expand">
       <template #default="{ row }">
-        <div v-if="row.imgs && row.imgs.length" class="image-preview">
-          <el-image v-for="(img, index) in row.imgs" :key="index" :src="img" :preview-src-list="row.imgs"
-            :initial-index="index" :preview-teleported="true" :z-index="3000" fit="cover" class="table-image"
-            style="width: 50px; height: 50px; margin-right: 4px" />
-        </div>
-        <span v-else>无图片</span>
+        <el-descriptions :column="2" border style="margin: 10px 20px;">
+          <el-descriptions-item label="商品图片">
+            <div v-if="row.imgs && row.imgs.length" class="image-preview">
+              <el-image v-for="(img, index) in row.imgs" :key="index" :src="img" :preview-src-list="row.imgs"
+                :initial-index="index" :preview-teleported="true" :z-index="3000" fit="cover" class="table-image"
+                style="width: 60px; height: 60px; margin-right: 5px; border-radius: 4px;" />
+            </div>
+            <span v-else>无图片</span>
+          </el-descriptions-item>
+          <el-descriptions-item label="商品描述">{{ row.itemDesc }}</el-descriptions-item>
+          <el-descriptions-item label="进货价格">{{ row.price }}</el-descriptions-item>
+          <el-descriptions-item label="会员价格">{{ row.vipPrice }}</el-descriptions-item>
+          <el-descriptions-item label="供应商">{{ row.supplyName }}</el-descriptions-item>
+          <el-descriptions-item label="产地">{{ row.placeName }}</el-descriptions-item>
+          <el-descriptions-item label="单位">{{ row.unitName }}</el-descriptions-item>
+          <el-descriptions-item label="所属仓库">{{ row.storeName }}</el-descriptions-item>
+          <el-descriptions-item label="生产日期">{{ row.itemDate }}</el-descriptions-item>
+          <el-descriptions-item label="到期日期">{{ row.endDate }}</el-descriptions-item>
+          <el-descriptions-item label="促销标题">{{ row.hotTitle }}</el-descriptions-item>
+          <el-descriptions-item label="制造商">{{ row.facturer }}</el-descriptions-item>
+          <el-descriptions-item label="创建者">{{ row.createBy }}</el-descriptions-item>
+        </el-descriptions>
       </template>
     </el-table-column>
     <el-table-column prop="itemNum" label="商品编号" />
     <el-table-column prop="itemName" label="商品名称" />
-    <el-table-column prop="store" label="库存数量" />
-    <el-table-column prop="price" label="进货价格" />
+    <el-table-column prop="cateName" label="商品类型" />
+    <el-table-column prop="brandName" label="品牌" />
+    <el-table-column prop="store" label="库存" width="80" />
     <el-table-column prop="sellPrice" label="销售价格" />
-    <el-table-column prop="vipPrice" label="会员价格" />
-    <el-table-column prop="statue" label="商品状态">
+    <el-table-column prop="statue" label="状态" width="80">
       <template #default="{ row }">
-        {{ row.statue === 1 ? '上架' : '下架' }}
+        <el-tag :type="row.statue === 1 ? 'success' : 'danger'">
+          {{ row.statue === 1 ? '上架' : '下架' }}
+        </el-tag>
       </template>
     </el-table-column>
     <el-table-column fixed="right" label="操作" width="150">
@@ -191,7 +209,7 @@
 </template>
 
 <script setup>
-import { reactive, ref, computed, onMounted } from "vue";
+import { reactive, ref, computed, onMounted, nextTick } from "vue";
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from "element-plus";
 import { categoryApi } from "@/api/category";
@@ -278,8 +296,41 @@ const storeList = ref([]);
 
 // 打开商品信息对话框并加载所有数据
 function openItemDialog() {
+  // 重置表单和相关状态
+  Object.assign(itemForm, {
+    id: null, // 清除可能存在的id，确保是添加操作
+    itemNum: '',
+    itemName: '',
+    typeId: null,
+    store: 0,
+    brandId: null,
+    storeId: null,
+    supplyId: null,
+    placeId: null,
+    unitId: null,
+    price: 0,
+    sellPrice: 0,
+    vipPrice: 0,
+    itemDesc: '',
+    itemDate: null,
+    endDate: null,
+    hotTitle: '',
+    facturer: '',
+    statue: 1,
+    imgs: [],
+    createBy: ''
+  });
+  selectedTypeName.value = '';
+  fileList.value = [];
+  //确保DOM更新完毕后再调用resetFields，以保证itemFormRef可用
+  nextTick(() => {
+    if (itemFormRef.value) {
+      itemFormRef.value.resetFields();
+    }
+  });
+
   dialogItemVisible.value = true;
-  loadAllData();
+  loadAllData(); // 加载下拉框等所需数据
 }
 
 // 打开商品类型选择对话框
@@ -408,8 +459,16 @@ function loadTypeList() {
 function loadItemList(pageNum = 1) {
   itemApi.getItemList(pageNum, 10)
     .then((response) => {
-      itemList.value = response.data;
-      total.value = response.data.length * 10;
+      // 确保从后端正确解析数据
+      if (response.data && response.data.items) {
+        itemList.value = response.data.items;
+        total.value = response.data.total;
+      } else {
+        // 处理可能的空数据或错误格式
+        itemList.value = [];
+        total.value = 0;
+        ElMessage.warning('商品数据格式不正确或为空');
+      }
     })
     .catch(() => {
       ElMessage.error('加载商品列表失败');
@@ -469,7 +528,7 @@ function openUpdateDialog(row) {
     createBy: row.createBy || ''
   });
   fileList.value = (row.imgs || []).map(url => ({ url, status: 'success' }));
-  selectedTypeName.value = row.typeName || '';
+  selectedTypeName.value = row.cateName || ''; // 使用 cateName 对应后端的商品类型名称
   loadAllData();
 }
 
