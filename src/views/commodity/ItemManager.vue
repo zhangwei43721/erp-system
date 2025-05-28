@@ -329,6 +329,15 @@ function openItemDialog() {
     }
   });
 
+  // 获取商品编号
+  itemApi.getItemCode()
+    .then(response => {
+      itemForm.itemNum = response.data;
+    })
+    .catch(() => {
+      ElMessage.error('获取商品编号失败');
+    });
+
   dialogItemVisible.value = true;
   loadAllData(); // 加载下拉框等所需数据
 }

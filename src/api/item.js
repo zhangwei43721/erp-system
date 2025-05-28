@@ -7,6 +7,11 @@ export const itemApi = {
     return request.get(`/listItems?pageNum=${pageNum}&pageSize=${pageSize}`)
   },
 
+  // 获取商品编号
+  getItemCode() {
+    return request.get('/getCode')
+  },
+
   // 保存商品
   saveItem(data) {
     return request.post('/saveItem', data)
