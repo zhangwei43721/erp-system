@@ -79,10 +79,11 @@
         </el-tag>
       </template>
     </el-table-column>
-    <el-table-column fixed="right" label="操作" width="150">
+    <el-table-column fixed="right" label="操作" width="180">
       <template #default="{ row }">
         <el-button link size="small" type="primary" @click="handleDeleteItem(row.id)">删除</el-button>
         <el-button link size="small" type="primary" @click="openUpdateDialog(row)">修改</el-button>
+        <el-button link size="small" type="primary" @click="openPurchaseDialog(row)">采购</el-button>
         <el-button v-if="row.statue === 1" link size="small" type="success" @click="handleUpItem(row.id)">上架</el-button>
         <el-button v-if="row.statue === 0" link size="small" type="warning" @click="handleDownItem(row.id)">下架</el-button>
       </template>
@@ -239,6 +240,37 @@
     </template>
   </el-dialog>
 
+  <!-- 采购对话框 -->
+  <el-dialog v-model="buyDialog" title="商品采购" :width="dialogWidth">
+    <el-form :model="buyForm" label-width="120px" ref="buyFormRef">
+      <el-form-item label="商品名称">
+        <el-input v-model="buyForm.itemName" disabled />
+      </el-form-item>
+      <el-form-item label="门店">
+        <el-input v-model="buyForm.storeName" disabled />
+      </el-form-item>
+      <el-form-item label="供应商">
+        <el-input v-model="buyForm.supplyName" disabled />
+      </el-form-item>
+      <el-form-item label="产地">
+        <el-input v-model="buyForm.placeName" disabled />
+      </el-form-item>
+      <el-form-item label="采购数量" prop="buyNum">
+        <el-input v-model="buyForm.buyNum" type="number" />
+      </el-form-item>
+      <el-form-item label="采购人" prop="buyUser">
+        <el-input v-model="buyForm.buyUser" />
+      </el-form-item>
+      <el-form-item label="联系电话" prop="phone">
+        <el-input v-model="buyForm.phone" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="buyDialog = false">取消</el-button>
+      <el-button type="primary" @click="submitPurchase">确认采购</el-button>
+    </template>
+  </el-dialog>
+
   <!-- 图片预览组件 -->
   <el-image-viewer v-if="dialogVisible" :hide-on-click-modal="false" :initial-index="0" :teleported="true"
                    :url-list="[dialogImageUrl]" :z-index="3000" :zoom-rate="1.2" @close="dialogVisible = false"/>
@@ -265,6 +297,16 @@ const itemFormRef = ref(null);
 const typeTreeRef = ref(null);
 const searchFormRef = ref(null);
 const fileList = ref([]);
+
+// 采购表单数据
+const buyForm = reactive({
+  productId: '',storeId: '',supplyId: '',placeId: '',itemName: '',
+  storeName: '',supplyName: '',placeName: '',buyNum: '',buyUser: '',phone: ''
+});
+
+// 采购对话框状态
+const buyDialog = ref(false);
+const buyFormRef = ref(null);
 
 // 列表数据
 const itemList = ref([]);
@@ -435,6 +477,30 @@ function submitItem() {
   });
 }
 
+// 提交采购表单
+function submitPurchase() {
+  buyFormRef.value.validate((valid) => {
+    if (valid) {
+      itemApi.saveBuy(buyForm)
+        .then((response) => {
+          if (response.data.code === 200) {
+            ElMessage.success(response.data.message || '采购成功');
+            buyDialog.value = false;
+            loadItemList(1); // 刷新商品列表
+          } else {
+            ElMessage.error(response.data.message || '采购失败');
+          }
+        })
+        .catch((error) => {
+          console.error('采购失败:', error);
+          ElMessage.error('采购失败，请稍后重试');
+        });
+    } else {
+      ElMessage.warning('请填写完整的采购信息');
+    }
+  });
+}
+
 // 加载所有数据
 function loadAllData() {
   Promise.all([
@@ -600,6 +666,30 @@ onMounted(() => {
 // 处理分页
 function handlePageChange(value) {
   loadItemList(value);
+}
+
+// 打开采购对话框
+function openPurchaseDialog(row) {
+  buyDialog.value = true;
+  // 发送ajax请求，获取需要带入的数据
+  itemApi.getBuyAutoInfo(row.id)
+    .then((response) => {
+      // 获取响应数据对象
+      const item = response.data;
+      // 将响应数据赋值给buyForm表单
+      buyForm.productId = item.id;
+      buyForm.itemName = item.itemName;
+      buyForm.storeId = item.storeId;
+      buyForm.storeName = item.storeName;
+      buyForm.supplyId = item.supplyId;
+      buyForm.supplyName = item.supplyName;
+      buyForm.placeId = item.placeId;
+      buyForm.placeName = item.placeName;
+    })
+    .catch((error) => {
+      console.error('获取采购信息失败:', error);
+      ElMessage.error('获取采购信息失败');
+    });
 }
 </script>
 

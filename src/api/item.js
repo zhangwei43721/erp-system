@@ -59,6 +59,16 @@ export const itemApi = {
     // 获取门店列表
     getStoreList() {
         return request.get('/storeList')
+    },
+
+    // 获取采购自动填充信息
+    getBuyAutoInfo(id) {
+        return request.get(`/buyAutoInfo/${id}`)
+    },
+
+    // 保存采购信息
+    saveBuy(data) {
+        return request.post('/saveBuy', data)
     }
 }
 
