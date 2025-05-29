@@ -263,7 +263,7 @@ const dialogVisible = ref(false);
 const dialogImageUrl = ref('');
 const itemFormRef = ref(null);
 const typeTreeRef = ref(null);
-const searchFormRef = ref(null); // 新增: 查询表单引用
+const searchFormRef = ref(null);
 const fileList = ref([]);
 
 // 列表数据
@@ -290,28 +290,14 @@ const searchForm = reactive({
 });
 
 // 商品表单数据
-const itemForm = reactive({
-  itemNum: '',
-  itemName: '',
-  typeId: null,
-  store: 0,
-  brandId: null,
-  storeId: null,
-  supplyId: null,
-  placeId: null,
-  unitId: null,
-  price: 0,
-  sellPrice: 0,
-  vipPrice: 0,
-  itemDesc: '',
-  itemDate: null,
-  endDate: null,
-  hotTitle: '',
-  facturer: '',
-  statue: 1,
-  imgs: [],
-  createBy: ''
-});
+const initialItemFormState = {
+  itemNum: '',  itemName: '',  typeId: null,  store: 0,  brandId: null,
+  storeId: null,  supplyId: null, placeId: null,  unitId: null, price: 0,
+  sellPrice: 0, vipPrice: 0,  itemDesc: '', itemDate: null, endDate: null,
+  hotTitle: '',   facturer: '', statue: 1,  imgs: [], createBy: '', id: null
+};
+
+const itemForm = reactive({ ...initialItemFormState });
 
 // 显示选中的类型名称
 const selectedTypeName = ref('');
@@ -336,39 +322,12 @@ const itemRules = {
 };
 
 // 列表数据
-const typeList = ref([]);
-const supplyList = ref([]);
-const placeList = ref([]);
-const unitList = ref([]);
-const brandList = ref([]);
-const storeList = ref([]);
+const typeList = ref([]), supplyList = ref([]), placeList = ref([]), unitList = ref([]), brandList = ref([]), storeList = ref([]);
 
 // 打开商品信息对话框并加载所有数据
 function openItemDialog() {
   // 重置表单和相关状态
-  Object.assign(itemForm, {
-    id: null, // 清除可能存在的id，确保是添加操作
-    itemNum: '',
-    itemName: '',
-    typeId: null,
-    store: 0,
-    brandId: null,
-    storeId: null,
-    supplyId: null,
-    placeId: null,
-    unitId: null,
-    price: 0,
-    sellPrice: 0,
-    vipPrice: 0,
-    itemDesc: '',
-    itemDate: null,
-    endDate: null,
-    hotTitle: '',
-    facturer: '',
-    statue: 1,
-    imgs: [],
-    createBy: ''
-  });
+  Object.assign(itemForm, { ...initialItemFormState });
   selectedTypeName.value = '';
   fileList.value = [];
   //确保DOM更新完毕后再调用resetFields，以保证itemFormRef可用
@@ -461,12 +420,7 @@ function submitItem() {
             }
             ElMessage.success(itemForm.id ? '修改成功' : '添加成功');
             dialogItemVisible.value = false;
-            Object.assign(itemForm, {
-              itemNum: '', itemName: '', typeId: null, store: 0, brandId: null,
-              storeId: null, supplyId: null, placeId: null, unitId: null, price: 0,
-              sellPrice: 0, vipPrice: 0, itemDesc: '', itemDate: null, endDate: null,
-              hotTitle: '', facturer: '', statue: 1, imgs: [], createBy: ''
-            });
+            Object.assign(itemForm, { ...initialItemFormState });
             selectedTypeName.value = '';
             fileList.value = [];
             loadItemList(1);
