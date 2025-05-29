@@ -23,28 +23,39 @@
 
 ### 安装项目依赖
 
-```
-yarn install
-```
-
-### 编译并热重载以进行开发
-
-```
-yarn serve
+```bash
+npm install
 ```
 
-### 编译并压缩以进行发布
+### 启动开发服务器
 
-```
-yarn build
-```
-
-### 检查并修复文件
-
-```
-yarn lint
+```bash
+npm run dev
 ```
 
-### 自定义配置
+### 构建生产版本
 
-查看 [配置参考](https://cli.vuejs.org/config/)。
+```bash
+npm run build
+```
+
+### 预览生产构建
+
+```bash
+npm run preview
+```
+
+### 技术栈
+
+- Vue 3
+- Vite
+- Element Plus
+- Vue Router
+- Axios
+- ECharts
+
+### 开发工具
+
+- Node.js >= 14.18.0
+- npm >= 7.0.0
+- Visual Studio Code（推荐）
