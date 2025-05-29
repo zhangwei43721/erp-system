@@ -109,7 +109,7 @@
       <el-row :gutter="20">
         <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="商品编号" prop="itemNum">
-            <el-input v-model="itemForm.itemNum"/>
+            <el-input v-model="itemForm.itemNum" readonly/>
           </el-form-item>
         </el-col>
         <el-col :md="8" :sm="12" :xs="24">
@@ -324,12 +324,17 @@ const itemRules = {
 // 列表数据
 const typeList = ref([]), supplyList = ref([]), placeList = ref([]), unitList = ref([]), brandList = ref([]), storeList = ref([]);
 
+// 重置与商品表单相关的状态（如选中的类型名称和文件列表）
+function resetItemRelatedState() {
+  selectedTypeName.value = '';
+  fileList.value = [];
+}
+
 // 打开商品信息对话框并加载所有数据
 function openItemDialog() {
   // 重置表单和相关状态
   Object.assign(itemForm, { ...initialItemFormState });
-  selectedTypeName.value = '';
-  fileList.value = [];
+  resetItemRelatedState();
   //确保DOM更新完毕后再调用resetFields，以保证itemFormRef可用
   nextTick(() => {
     if (itemFormRef.value) {
@@ -347,13 +352,11 @@ function openItemDialog() {
       });
 
   dialogItemVisible.value = true;
-  loadAllData(); // 加载下拉框等所需数据
 }
 
 // 打开商品类型选择对话框
 function openTypeDialog() {
   dialogTypeVisible.value = true;
-  loadTypeList();
 }
 
 // 处理类型树节点点击
@@ -421,8 +424,7 @@ function submitItem() {
             ElMessage.success(itemForm.id ? '修改成功' : '添加成功');
             dialogItemVisible.value = false;
             Object.assign(itemForm, { ...initialItemFormState });
-            selectedTypeName.value = '';
-            fileList.value = [];
+            resetItemRelatedState();
             loadItemList(1);
           })
           .catch((error) => {
@@ -453,17 +455,6 @@ function loadAllData() {
       })
       .catch(() => {
         ElMessage.error('加载数据失败，请稍后重试');
-      });
-}
-
-// 加载商品类型
-function loadTypeList() {
-  categoryApi.getCategoryTree()
-      .then((response) => {
-        typeList.value = response.data;
-      })
-      .catch(() => {
-        ElMessage.error('加载商品类型失败，请稍后重试');
       });
 }
 
@@ -603,6 +594,7 @@ function openUpdateDialog(row) {
 // 生命周期钩子
 onMounted(() => {
   loadItemList(1);
+  loadAllData(); // 组件挂载时加载所有下拉列表数据
 });
 
 // 处理分页
