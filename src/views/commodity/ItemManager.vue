@@ -11,8 +11,8 @@
       </el-form-item>
       <el-form-item label="状态" prop="statue">
         <el-select v-model="searchForm.statue" placeholder="请选择" clearable style="width: 100px;">
-          <el-option label="上架" :value="1" />
-          <el-option label="下架" :value="0" />
+          <el-option label="上架" :value="0" />
+          <el-option label="下架" :value="1" />
         </el-select>
       </el-form-item>
       <el-form-item>
@@ -28,12 +28,27 @@
       <template #default="{ row }">
         <el-descriptions :column="2" border style="margin: 10px 20px;">
           <el-descriptions-item label="商品图片">
-            <div v-if="row.imgs && row.imgs.length" class="image-preview">
-              <el-image v-for="(img, index) in row.imgs" :key="index" :initial-index="index" :preview-src-list="row.imgs"
-                        :preview-teleported="true" :src="img" :z-index="3000" class="table-image"
-                        fit="cover"
-                        style="width: 60px; height: 60px; margin-right: 5px; border-radius: 4px;"/>
-            </div>
+            <template v-if="row.imgs && Array.isArray(row.imgs) && row.imgs.length > 0">
+              <div class="image-preview">
+                <el-image v-for="(img, index) in row.imgs" 
+                         :key="index" 
+                         :src="img" 
+                         :preview-src-list="row.imgs"
+                         :initial-index="index"
+                         :preview-teleported="true"
+                         :z-index="3000"
+                         class="table-image"
+                         fit="cover"
+                         style="width: 60px; height: 60px; margin-right: 5px; border-radius: 4px;"
+                         @error="() => handleImageError(index)">
+                  <template #error>
+                    <div style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; background: #f5f7fa; color: #909399; font-size: 12px;">
+                      加载失败<br/>或无图片
+                    </div>
+                  </template>
+                </el-image>
+              </div>
+            </template>
             <span v-else>无图片</span>
           </el-descriptions-item>
           <el-descriptions-item label="商品描述">{{ row.itemDesc }}</el-descriptions-item>
@@ -192,8 +207,8 @@
         <el-col :md="8" :sm="12" :xs="24">
           <el-form-item label="商品状态" prop="statue">
             <el-select v-model="itemForm.statue" placeholder="请选择状态">
-              <el-option :value="1" label="上架"/>
-              <el-option :value="0" label="下架"/>
+              <el-option :value="0" label="上架"/>
+              <el-option :value="1" label="下架"/>
             </el-select>
           </el-form-item>
         </el-col>
@@ -235,6 +250,11 @@ import {Plus} from '@element-plus/icons-vue';
 import {ElMessage, ElMessageBox} from "element-plus";
 import {categoryApi} from "@/api/category";
 import {itemApi, uploadImageUrl} from "@/api/item";
+
+// 处理图片加载错误
+function handleImageError(index) {
+  console.warn(`图片加载失败: ${index}`);
+}
 
 // 对话框状态和图片上传相关
 const dialogItemVisible = ref(false);
