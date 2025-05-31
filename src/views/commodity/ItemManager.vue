@@ -487,6 +487,10 @@ function submitPurchase() {
             ElMessage.success(response.data.message || '采购成功');
             buyDialog.value = false;
             loadItemList(1); // 刷新商品列表
+            Object.assign(buyForm, {
+              productId: '', storeId: '', supplyId: '', placeId: '', itemName: '',
+              storeName: '', supplyName: '', placeName: '', buyNum: '', buyUser: '', phone: ''
+            });
           } else {
             ElMessage.error(response.data.message || '采购失败');
           }
