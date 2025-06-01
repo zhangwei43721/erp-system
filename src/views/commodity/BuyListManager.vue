@@ -72,21 +72,27 @@
 </template>
 
 <script setup>
-import axios from 'axios';
 import { onMounted, reactive, ref } from "vue";
 import { ElMessage } from "element-plus";
+import { BuyListApi } from '@/api/BuyList';
+
 //声明列表集合数据
 const buyList = ref([]);
 //声明total
 const total = ref(0);
 //定义函数发送请求，加载采购单列表
 function queryBuyList(pageNum) {
-  axios.get("http://localhost:8080/queryBuyList?pageNum=" + pageNum)
+  BuyListApi.queryBuyList(pageNum)
     .then((response) => {
       buyList.value = response.data.buyLists;
       total.value = response.data.total;
     })
+    .catch(error => {
+      console.error('获取采购单列表失败:', error);
+      ElMessage.error('获取采购单列表失败');
+    });
 }
+
 //加载页面调用函数
 onMounted(function () {
   queryBuyList(1);
@@ -118,7 +124,7 @@ const buyListDialog = ref(false);
 function showBuyListDialog(row) {
   var productId = row.productId;
   buyListDialog.value = true;
-  axios.get("http://localhost:8080/buyAutoInfo/" + productId)
+  BuyListApi.getBuyAutoInfo(productId)
     .then((response) => {
       //获得响应数据对象
       var item = response.data;
@@ -137,15 +143,16 @@ function showBuyListDialog(row) {
       buyForm.phone = row.phone;
       //表单中封装采购单id
       buyForm.buyId = row.buyId;
-
     })
     .catch((error) => {
-      console.log(error);
+      console.error('获取采购信息失败:', error);
+      ElMessage.error('获取采购信息失败');
     });
 }
+
 /*发送采购单更新的ajax请求*/
 function updateBuyOrder() {
-  axios.post("http://localhost:8080/updateBuyList", buyForm)
+  BuyListApi.updateBuyList(buyForm)
     .then((response) => {
       if (response.data.code == 200) {
         buyListDialog.value = false;
@@ -155,42 +162,62 @@ function updateBuyOrder() {
       ElMessage(response.data.message);
     })
     .catch((error) => {
-      console.log(error);
+      console.error('更新采购单失败:', error);
+      ElMessage.error('更新采购单失败');
     })
 }
+
 //定义函数发生采购单删除的请求
 function delBuyList(id) {
-  axios.get("http://localhost:8080/deleteBuyList/" + id)
+  BuyListApi.deleteBuyList(id)
     .then((response) => {
       if (response.data.code == 200) {
         //刷新列表
         queryBuyList(1);
       }
       ElMessage(response.data.message);
-
     })
-    .catch((ex) => {
-      console.log(ex);
+    .catch((error) => {
+      console.error('删除采购单失败:', error);
+      ElMessage.error('删除采购单失败');
     });
 }
 
 //定义入库按钮函数
-function doInStore(row){
-  axios.post("http://localhost:8080/buyInStore",row)
-  .then((response)=>{
-    if(response.data.code==200){
-      //刷新列表
-      queryBuyList(1);
-    }
-    ElMessage(response.data.message);
-  })
-      .catch((ex)=>{
-        console.log(ex);
-      });
+function doInStore(row) {
+  BuyListApi.buyInStore(row)
+    .then((response) => {
+      if (response.data.code == 200) {
+        //刷新列表
+        queryBuyList(1);
+      }
+      ElMessage(response.data.message);
+    })
+    .catch((error) => {
+      console.error('生成入库单失败:', error);
+      ElMessage.error('生成入库单失败');
+    });
 }
+
 //发送请求进行数据导出
-function exportData(){
-  location.href="http://localhost:8080/exportExcel";
+function exportData() {
+  BuyListApi.exportData().then(response => {
+    const blob = new Blob([response.data], {
+      type: 'application/vnd.ms-excel'
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', '采购单数据.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    // 清理释放URL对象
+    window.URL.revokeObjectURL(url);
+  }).catch(error => {
+    console.error('导出数据失败:', error);
+    ElMessage.error('导出数据失败');
+  });
 }
 </script>
 
