@@ -49,18 +49,18 @@ const views = [
   /* 2 */ viewComponents.listAfterSale,     // 客户管理 -> 售后服务 (component=2)
   /* 3 */ viewComponents.listCustOrder,     // 客户管理 -> 客户订单 (component=3)
   /* 4 */ viewComponents.addSellJh,         // 客户管理 -> 销售过程 (component=4)
-  /* 5 */ null,      // 数据统计 -> 客户统计 (component=5) - Assumption: reuses listCustomer or you have a specific customer stats component
+  /* 5 */ null,      
   /* 6 */ viewComponents.stockStatistics,   // 数据统计 -> 库存统计 (component=6)
   /* 7 */ viewComponents.listSellJh,        // 客户管理 -> 销售过程列表 (component=7)
   /* 8 */ viewComponents.addMenus,          // 系统管理 -> 添加菜单 (component=8)
   /* 9 */ viewComponents.userManager,       // 系统管理 -> 用户管理 (component=9)
   /* 10 */ viewComponents.rolerManager,     // 系统管理 -> 角色管理 (component=10)
-  /* 11 */ null,                            // No menu item with component = 11
-  /* 12 */ null,                            // No menu item with component = 12
-  /* 13 */ null,                            // No menu item with component = 13
+  /* 11 */ null,
+  /* 12 */ null,
+  /* 13 */ null,
   /* 14 */ viewComponents.categoryManager,  // 商品管理 -> 商品分类 (component=14)
-  /* 15 */ viewComponents.itemManager,      // 商品管理 -> 商品入库 (component=15) - Assumption: itemManager handles this
-  /* 16 */ viewComponents.itemManager,      // 商品管理 -> 商品出库 (component=16) - Assumption: itemManager handles this
+  /* 15 */ viewComponents.itemManager,      // 商品管理 -> 商品入库 (component=15)
+  /* 16 */ null,
   /* 17 */ viewComponents.buyListManager,   // 商品管理 -> 采购单管理 (component=17)
 ];
 

@@ -79,7 +79,7 @@
         </el-tag>
       </template>
     </el-table-column>
-    <el-table-column fixed="right" label="操作" width="180">
+    <el-table-column fixed="right" label="操作" width="200">
       <template #default="{ row }">
         <el-button link size="small" type="primary" @click="handleDeleteItem(row.id)">删除</el-button>
         <el-button link size="small" type="primary" @click="openUpdateDialog(row)">修改</el-button>
