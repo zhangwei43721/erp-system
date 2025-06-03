@@ -79,11 +79,13 @@
         </el-tag>
       </template>
     </el-table-column>
+
     <el-table-column fixed="right" label="操作" width="200">
       <template #default="{ row }">
         <el-button link size="small" type="primary" @click="handleDeleteItem(row.id)">删除</el-button>
         <el-button link size="small" type="primary" @click="openUpdateDialog(row)">修改</el-button>
         <el-button link size="small" type="primary" @click="openPurchaseDialog(row)">采购</el-button>
+        <el-button link type="primary" size="small" @click="openOutDialog(row)">出库</el-button>
         <el-button v-if="row.statue === 1" link size="small" type="success" @click="handleUpItem(row.id)">上架</el-button>
         <el-button v-if="row.statue === 0" link size="small" type="warning" @click="handleDownItem(row.id)">下架</el-button>
       </template>
@@ -274,6 +276,32 @@
   <!-- 图片预览组件 -->
   <el-image-viewer v-if="dialogVisible" :hide-on-click-modal="false" :initial-index="0" :teleported="true"
                    :url-list="[dialogImageUrl]" :z-index="3000" :zoom-rate="1.2" @close="dialogVisible = false"/>
+    <!-- 出库对话框组件 -->
+  <el-dialog
+      v-model="itemOutDialog"
+      width="60%">
+    <h2>商品采购</h2>
+
+    <el-form :model="outForm" label-width="120px">
+      <el-form-item label="商品名称">
+        {{ outForm.itemName }}
+      </el-form-item>
+      <el-form-item label="仓库">
+        {{ outForm.storeName }}
+      </el-form-item>
+      <el-form-item label="商品库存">
+        {{ outForm.store }}
+      </el-form-item>
+      <el-form-item label="出库数量">
+        <el-input v-model="outForm.outNum" style="width: 80%"/>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button type="primary" @click="saveOutOrder">保存</el-button>
+        <el-button>取消</el-button>
+      </el-form-item>
+    </el-form>
+  </el-dialog>
 </template>
 
 <script setup>
@@ -694,6 +722,48 @@ function openPurchaseDialog(row) {
       console.error('获取采购信息失败:', error);
       ElMessage.error('获取采购信息失败');
     });
+}
+//声明出库对话框状态
+const itemOutDialog=ref(false);
+//声明商品出库form表单
+const outForm=reactive({
+  itemName:'',
+  storeName:'',
+  store:0,
+  outNum:0,
+  productId: undefined
+});
+
+//定义函数打开商品出库对话框
+function openOutDialog(row){
+  itemOutDialog.value=true;
+  outForm.itemName=row.itemName;
+  outForm.store=row.store;
+  outForm.storeName=row.storeName;
+  outForm.productId = row.id;
+  outForm.outNum = 0;
+}
+//定义函数发生商品出库请求
+function saveOutOrder() {
+  if (!outForm.outNum || outForm.outNum <= 0) {
+    ElMessage.warning('请输入正确的出库数量');
+    return;
+  }
+  if (outForm.outNum > outForm.store) {
+    ElMessage.warning('出库数量不能大于库存');
+    return;
+  }
+  itemApi.doItemOutStore(outForm)
+      .then((response) => {
+        if (response.data.code == 200) {
+          itemOutDialog.value = false;
+          loadItemList(1); // 出库成功后刷新商品列表
+        }
+        ElMessage(response.data.message);
+      })
+      .catch((error) => {
+        console.log(error);
+      })
 }
 </script>
 

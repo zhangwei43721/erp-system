@@ -69,7 +69,10 @@ export const itemApi = {
     // 保存采购信息
     saveBuy(data) {
         return request.post('/saveBuy', data)
-    }
+    },
+    doItemOutStore(data) {
+        return request.post('/doItemOutStore', data)
+    },
 }
 
 // 上传图片 URL

@@ -13,6 +13,8 @@ import StockStatistics from "@/views/statistics/StockStatistics.vue";
 import CategoryManager from "@/views/commodity/CategoryManager.vue";
 import ItemManager from "./views/commodity/ItemManager.vue";
 import BuyListManager from "./views/commodity/BuyListManager.vue";
+import InStoreList from "./views/commodity/InStoreList.vue";
+import ListOutStore from "./views/commodity/ListOutStore.vue";
 
 import emitter from "@/eventBus";
 
@@ -41,6 +43,8 @@ const viewComponents = {
   categoryManager: markRaw(CategoryManager),
   itemManager: markRaw(ItemManager),
   buyListManager: markRaw(BuyListManager),
+  inStoreList: markRaw(InStoreList),
+  listOutStore: markRaw(ListOutStore),
 };
 
 const views = [
@@ -60,8 +64,9 @@ const views = [
   /* 13 */ null,
   /* 14 */ viewComponents.categoryManager,  // 商品管理 -> 商品分类 (component=14)
   /* 15 */ viewComponents.itemManager,      // 商品管理 -> 商品入库 (component=15)
-  /* 16 */ null,
+  /* 19 */ viewComponents.listOutStore,     // 商品管理 -> 出库列表 (component=19)
   /* 17 */ viewComponents.buyListManager,   // 商品管理 -> 采购单管理 (component=17)
+  /* 18 */ viewComponents.inStoreList,      // 商品管理 -> 入库列表 (component=18)
 ];
 
 const currentComponent = shallowRef(null); // 修改初始值，等待 onMounted 中恢复或设置
