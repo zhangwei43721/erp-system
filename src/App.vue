@@ -9,7 +9,7 @@ import ListAfterSale from "@/views/Custom_Manage/ListAfterSale.vue";
 import AddMenus from "@/views/Sys_Manage/AddMenus.vue";
 import RolerManager from "@/views/Sys_Manage/RolerManager.vue";
 import UserManager from "@/views/Sys_Manage/UserManager.vue";
-import StockStatistics from "@/views/statistics/StockStatistics.vue";
+import StockStatistics from "@/views/statistics/YearMonthCount.vue";
 import CategoryManager from "@/views/commodity/CategoryManager.vue";
 import ItemManager from "./views/commodity/ItemManager.vue";
 import BuyListManager from "./views/commodity/BuyListManager.vue";
