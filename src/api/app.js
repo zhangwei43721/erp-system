@@ -5,7 +5,7 @@ export const appApi = {
     // 获取组件索引
     getComponentIndex(id) {
         return request.get('/compIndex', {
-            params: {id}
+            params: { id }
         })
     },
 

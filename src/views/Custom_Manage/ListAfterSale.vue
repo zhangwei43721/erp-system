@@ -2,46 +2,46 @@
   <h2>客户投诉列表</h2>
   <el-form :inline="true" :model="condForm">
     <el-form-item label="投诉单号">
-      <el-input v-model="condForm.id"/>
+      <el-input v-model="condForm.id" />
     </el-form-item>
     <el-form-item label="问题描述">
-      <el-input v-model="condForm.question"/>
+      <el-input v-model="condForm.question" />
     </el-form-item>
 
-    <br/>
+    <br />
     <el-form-item label="紧急程度" style="width: 22%">
       <el-select v-model="condForm.grade" placeholder="请选择....">
-        <el-option label="普通" value="普通"/>
-        <el-option label="加急" value="加急"/>
+        <el-option label="普通" value="普通" />
+        <el-option label="加急" value="加急" />
 
 
       </el-select>
     </el-form-item>
     <el-form-item label="处理状态" style="width: 22%">
       <el-select v-model="condForm.state" placeholder="请选择....">
-        <el-option label="未处理" value="未处理"/>
-        <el-option label="已处理" value="已处理"/>
-        <el-option label="未回访" value="未回访"/>
-        <el-option label="已回访" value="已回访"/>
+        <el-option label="未处理" value="未处理" />
+        <el-option label="已处理" value="已处理" />
+        <el-option label="未回访" value="未回访" />
+        <el-option label="已回访" value="已回访" />
 
       </el-select>
     </el-form-item>
-    <br/>
+    <br />
     <el-form-item>
       <el-button type="primary" @click="subQueryAfter">查询</el-button>
 
     </el-form-item>
   </el-form>
 
-  <hr/>
+  <hr />
 
   <el-table :data="afterSaleList" stripe style="width: 100%">
-    <el-table-column label="投诉编号" prop="id"/>
-    <el-table-column label="客户姓名" prop="custName"/>
-    <el-table-column label="问题类型" prop="question"/>
-    <el-table-column label="处理状态" prop="state"/>
-    <el-table-column label="紧急程度" prop="grade"/>
-    <el-table-column label="投诉满意度" prop="level"/>
+    <el-table-column label="投诉编号" prop="id" />
+    <el-table-column label="客户姓名" prop="custName" />
+    <el-table-column label="问题类型" prop="question" />
+    <el-table-column label="处理状态" prop="state" />
+    <el-table-column label="紧急程度" prop="grade" />
+    <el-table-column label="投诉满意度" prop="level" />
 
     <el-table-column fixed="right" label="操作" width="200">
       <template #default="scope">
@@ -53,10 +53,10 @@
     </el-table-column>
 
   </el-table>
-  <hr/>
+  <hr />
 
   <el-pagination :page-size="10" :pager-count="7" :total="total" background class="mt-4" layout="prev, pager, next"
-                 size="small" @current-change="handlerSalePageChange"/>
+    size="small" @current-change="handlerSalePageChange" />
 
   <!-- 添加对话框控件 -->
   <!-- 回显客户信息的对话框 -->
@@ -66,7 +66,7 @@
     <!-- 对话框中添加form -->
     <el-form :model="replayForm" label-width="120px">
       <el-form-item label="回复内容">
-        <el-input v-model="replayForm.content" style="width: 80%;height: 120px" type="textarea"/>
+        <el-input v-model="replayForm.content" style="width: 80%;height: 120px" type="textarea" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="subReplayForm">保存</el-button>
@@ -84,14 +84,14 @@
     <div style="text-align: left">
 
       <el-text>投诉人:{{ question.custName }}</el-text>
-      <br/>
+      <br />
       <el-text>投诉问题:{{ question.quesDesc }}</el-text>
       <!--   table    -->
       <el-table :data="replaysList" stripe style="width: 100% ;height: 200px">
-        <el-table-column label="编号" prop="id"/>
-        <el-table-column label="时间" prop="redate"/>
-        <el-table-column label="评分" prop="score"/>
-        <el-table-column label="内容" prop="content"/>
+        <el-table-column label="编号" prop="id" />
+        <el-table-column label="时间" prop="redate" />
+        <el-table-column label="评分" prop="score" />
+        <el-table-column label="内容" prop="content" />
         <!--        <el-table-column fixed="right" label="操作" width="200">
           <template #default="scope">
             <el-button link type="primary" size="small"
@@ -106,11 +106,10 @@
       </el-table>
 
       <!--   分页    -->
-      <hr/>
+      <hr />
 
       <el-pagination :page-size="10" :pager-count="7" :total="totalReplay" background class="mt-4"
-                     layout="prev, pager, next"
-                     size="small" @current-change="handlerReplayPageChange"/>
+        layout="prev, pager, next" size="small" @current-change="handlerReplayPageChange" />
 
     </div>
 
@@ -119,9 +118,9 @@
 </template>
 
 <script setup>
-import {onMounted, reactive, ref} from "vue";
-import {ElMessage} from "element-plus";
-import {customerApi} from "@/api/customer";
+import { onMounted, reactive, ref } from "vue";
+import { ElMessage } from "element-plus";
+import { customerApi } from "@/api/customer";
 //数据库总记录数
 const total = ref(0)
 //声明投诉列表集合
@@ -138,14 +137,14 @@ const condForm = reactive({
 function queryAfterSaleList(pageNum) {
   condForm.pageNum = pageNum;
   customerApi.getAfterSaleList(condForm)
-      .then((response) => {
-        afterSaleList.value = response.data.afterSalesList;
-        total.value = response.data.total;
-      })
-      .catch((error) => {
-        console.log(error);
+    .then((response) => {
+      afterSaleList.value = response.data.afterSalesList;
+      total.value = response.data.total;
+    })
+    .catch((error) => {
+      console.log(error);
 
-      });
+    });
 }
 
 //加载视图进行调用
@@ -180,18 +179,18 @@ function openReplayDialog(qid) {
 function subReplayForm() {
   //发送aajx请求
   customerApi.saveReply(replayForm)
-      .then((response) => {
-        if (response.data.code === 200) {
-          dialogReplayVisible.value = false;
-          replayForm.content = '';  //清空回复内容
-          ElMessage(response.data.message);
-        } else {
-          ElMessage(response.data.message);
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    .then((response) => {
+      if (response.data.code === 200) {
+        dialogReplayVisible.value = false;
+        replayForm.content = '';  //清空回复内容
+        ElMessage(response.data.message);
+      } else {
+        ElMessage(response.data.message);
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
 
 //定义回复列表对话框状态
@@ -216,26 +215,26 @@ function loadQuestionReplayList(row) {
   qid = row.id;
   //发送ajax请求
   customerApi.getReplyList(row.id)
-      .then((response) => {
-        replaysList.value = response.data.replayList;
-        totalReplay.value = response.data.total;
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+    .then((response) => {
+      replaysList.value = response.data.replayList;
+      totalReplay.value = response.data.total;
+    })
+    .catch((error) => {
+      console.log(error);
+    })
 }
 
 //提交分页查询参数的请求
 function handlerReplayPageChange(pageNum) {
   //发送ajax请求
   customerApi.getReplyList(qid, pageNum)
-      .then((response) => {
-        replaysList.value = response.data.replayList;
-        totalReplay.value = response.data.total;
-      })
-      .catch((error) => {
-        console.log(error);
-      })
+    .then((response) => {
+      replaysList.value = response.data.replayList;
+      totalReplay.value = response.data.total;
+    })
+    .catch((error) => {
+      console.log(error);
+    })
 }
 </script>
 

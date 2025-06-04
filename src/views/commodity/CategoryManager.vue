@@ -4,7 +4,7 @@
     <h4>选择分类节点进行管理</h4>
     <!-- tree控件 -->
     <el-tree ref="treeRef" :data="categoryList" :expand-on-click-node="false" :highlight-current="true" :props="config"
-             default-expand-all node-key="id" @node-click="handleClickNode">
+      default-expand-all node-key="id" @node-click="handleClickNode">
       <template #default="{ node, data }">
         <span class="custom-tree-node">
           <span>{{ node.label }}</span>
@@ -20,17 +20,17 @@
       </template>
     </el-tree>
   </div>
-  <hr/>
+  <hr />
   <!-- 添加商品类目表单 -->
   <el-form :model="categoryForm" class="category-form" label-width="120px">
     <el-form-item label="分类编号">
-      <el-input v-model="categoryForm.isbn" placeholder="请输入分类编号" style="width: 80%"/>
+      <el-input v-model="categoryForm.isbn" placeholder="请输入分类编号" style="width: 80%" />
     </el-form-item>
     <el-form-item label="分类名称">
-      <el-input v-model="categoryForm.cateName" placeholder="请输入分类名称" style="width: 80%"/>
+      <el-input v-model="categoryForm.cateName" placeholder="请输入分类名称" style="width: 80%" />
     </el-form-item>
     <el-form-item label="分类描述">
-      <el-input v-model="categoryForm.remark" placeholder="请输入分类描述" style="width: 80%"/>
+      <el-input v-model="categoryForm.remark" placeholder="请输入分类描述" style="width: 80%" />
     </el-form-item>
 
     <el-form-item>
@@ -41,9 +41,9 @@
 </template>
 
 <script setup>
-import {onMounted, reactive, ref} from "vue";
-import {ElMessage, ElMessageBox} from "element-plus";
-import {categoryApi} from "@/api/category";
+import { onMounted, reactive, ref } from "vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { categoryApi } from "@/api/category";
 
 // --- 树配置 ---
 const config = {
@@ -58,13 +58,13 @@ const categoryList = ref([]);
 // --- 数据加载 ---
 function queryCategoryTree() {
   categoryApi.getCategoryTree()
-      .then((response) => {
-        categoryList.value = response.data;
-      })
-      .catch((error) => {
-        console.error('加载分类树失败:', error);
-        ElMessage.error('加载分类树失败，请稍后重试');
-      });
+    .then((response) => {
+      categoryList.value = response.data;
+    })
+    .catch((error) => {
+      console.error('加载分类树失败:', error);
+      ElMessage.error('加载分类树失败，请稍后重试');
+    });
 }
 
 onMounted(() => {
@@ -121,36 +121,36 @@ function saveCategoryForm() {
   }
 
   const apiCall = categoryForm.id === 0
-      ? categoryApi.saveCategory(categoryForm)
-      : categoryApi.updateCategory(categoryForm);
+    ? categoryApi.saveCategory(categoryForm)
+    : categoryApi.updateCategory(categoryForm);
 
   apiCall
-      .then((response) => {
-        if (response.data.code === 200) {
-          ElMessage.success(response.data.message);
-          queryCategoryTree();
-          resetForm();
-        } else {
-          ElMessage.error(response.data.message);
-        }
-      })
-      .catch((error) => {
-        console.error('保存失败:', error);
-        ElMessage.error('保存失败，请稍后重试');
-      });
+    .then((response) => {
+      if (response.data.code === 200) {
+        ElMessage.success(response.data.message);
+        queryCategoryTree();
+        resetForm();
+      } else {
+        ElMessage.error(response.data.message);
+      }
+    })
+    .catch((error) => {
+      console.error('保存失败:', error);
+      ElMessage.error('保存失败，请稍后重试');
+    });
 }
 
 // --- 修改操作 ---
 function showCategory(node, data) {
   categoryApi.getCategoryById(data.id)
-      .then((response) => {
-        Object.assign(categoryForm, response.data);
-        pnode = node;
-      })
-      .catch((error) => {
-        console.error('加载分类信息失败:', error);
-        ElMessage.error('加载分类信息失败，请稍后重试');
-      });
+    .then((response) => {
+      Object.assign(categoryForm, response.data);
+      pnode = node;
+    })
+    .catch((error) => {
+      console.error('加载分类信息失败:', error);
+      ElMessage.error('加载分类信息失败，请稍后重试');
+    });
 }
 
 // --- 删除操作 ---
@@ -161,33 +161,33 @@ function handleDelete(node, data) {
   }
 
   ElMessageBox.confirm(
-      '确定要删除该分类吗？',
-      '警告',
-      {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning',
-      }
+    '确定要删除该分类吗？',
+    '警告',
+    {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
+    }
   )
-      .then(() => {
-        categoryApi.deleteCategory(data.id)
-            .then((response) => {
-              if (response.data.code === 200) {
-                ElMessage.success(response.data.message);
-                queryCategoryTree();
-                resetForm();
-              } else {
-                ElMessage.error(response.data.message);
-              }
-            })
-            .catch((error) => {
-              console.error('删除失败:', error);
-              ElMessage.error('删除失败，请稍后重试');
-            });
-      })
-      .catch(() => {
-        ElMessage.info('已取消删除');
-      });
+    .then(() => {
+      categoryApi.deleteCategory(data.id)
+        .then((response) => {
+          if (response.data.code === 200) {
+            ElMessage.success(response.data.message);
+            queryCategoryTree();
+            resetForm();
+          } else {
+            ElMessage.error(response.data.message);
+          }
+        })
+        .catch((error) => {
+          console.error('删除失败:', error);
+          ElMessage.error('删除失败，请稍后重试');
+        });
+    })
+    .catch(() => {
+      ElMessage.info('已取消删除');
+    });
 }
 </script>
 
@@ -200,6 +200,4 @@ function handleDelete(node, data) {
   font-size: 14px;
   padding-right: 8px;
 }
-
-
 </style>

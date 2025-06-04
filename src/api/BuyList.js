@@ -27,7 +27,7 @@ export const BuyListApi = {
     })
   },
 
-// 删除采购单
+  // 删除采购单
   deleteBuyList(id) {
     return request({
       url: `/deleteBuyList/${id}`,
@@ -35,7 +35,7 @@ export const BuyListApi = {
     })
   },
 
-// 生成入库单
+  // 生成入库单
   buyInStore(data) {
     return request({
       url: '/buyInStore',
@@ -44,7 +44,7 @@ export const BuyListApi = {
     })
   },
 
-// 导出数据
+  // 导出数据
   exportData() {
     return request({
       url: '/exportExcel',

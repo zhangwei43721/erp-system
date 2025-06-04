@@ -24,7 +24,7 @@ export const userApi = {
 
     // 删除用户
     deleteUser(id) {
-        return request.post('/deleteUser', {id})
+        return request.post('/deleteUser', { id })
     },
 
     // 查询用户角色

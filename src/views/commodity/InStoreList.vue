@@ -17,8 +17,8 @@
       <template #default="scope">
         <el-button link type="primary" size="small" @click="showInStoreDialog(scope.row)">修改</el-button>
         <el-button link type="primary" size="small" @click="delInStore(scope.row.insId)">删除</el-button>
-        <el-button link type="primary" size="small" v-if="scope.row.isIn==1"
-        @click="confirmIsIn(scope.row.insId)">确认入库</el-button>
+        <el-button link type="primary" size="small" v-if="scope.row.isIn == 1"
+          @click="confirmIsIn(scope.row.insId)">确认入库</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -141,17 +141,17 @@ function delInStore(id) {
     });
 }
 //定义函数发生入库单确认请求
-  function confirmIsIn(id){
-    InStoreApi.updateInStore(id)
-        .then((response)=>{
-          if(response.data.code==200){
-            queryInStoreList(1);//刷新
-          }
-        })
-        .catch((error)=>{
-          console.log(error);
-        })
-  }
+function confirmIsIn(id) {
+  InStoreApi.updateInStore(id)
+    .then((response) => {
+      if (response.data.code == 200) {
+        queryInStoreList(1);//刷新
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+}
 </script>
 
 <style scoped></style>
