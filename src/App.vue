@@ -16,6 +16,7 @@ import BuyListManager from "./views/commodity/BuyListManager.vue";
 import InStoreList from "./views/commodity/InStoreList.vue";
 import ListOutStore from "./views/commodity/ListOutStore.vue";
 import ListStore from "./views/commodity/ListStore.vue";
+import CustomerArea from "./views/statistics/CustomerArea.vue";
 
 import emitter from "@/eventBus";
 
@@ -47,6 +48,7 @@ const viewComponents = {
   inStoreList: markRaw(InStoreList),
   listOutStore: markRaw(ListOutStore),
   listStore: markRaw(ListStore),
+  customerArea: markRaw(CustomerArea),
 };
 
 const views = [
@@ -55,7 +57,7 @@ const views = [
   /* 2 */ viewComponents.listAfterSale,     // 客户管理 -> 售后服务 (component=2)
   /* 3 */ viewComponents.listCustOrder,     // 客户管理 -> 客户订单 (component=3)
   /* 4 */ viewComponents.addSellJh,         // 客户管理 -> 销售过程 (component=4)
-  /* 5 */ null,
+  /* 5 */ viewComponents.customerArea,    // 数据统计 -> 客户地区分布 (component=5)
   /* 6 */ viewComponents.stockStatistics,   // 数据统计 -> 库存统计 (component=6)
   /* 7 */ viewComponents.listSellJh,        // 客户管理 -> 销售过程列表 (component=7)
   /* 8 */ viewComponents.addMenus,          // 系统管理 -> 添加菜单 (component=8)
