@@ -15,6 +15,7 @@ import ItemManager from "./views/commodity/ItemManager.vue";
 import BuyListManager from "./views/commodity/BuyListManager.vue";
 import InStoreList from "./views/commodity/InStoreList.vue";
 import ListOutStore from "./views/commodity/ListOutStore.vue";
+import ListStore from "./views/commodity/ListStore.vue";
 
 import emitter from "@/eventBus";
 
@@ -45,6 +46,7 @@ const viewComponents = {
   buyListManager: markRaw(BuyListManager),
   inStoreList: markRaw(InStoreList),
   listOutStore: markRaw(ListOutStore),
+  listStore: markRaw(ListStore),
 };
 
 const views = [
@@ -67,6 +69,7 @@ const views = [
   /* 19 */ viewComponents.listOutStore,     // 商品管理 -> 出库列表 (component=19)
   /* 17 */ viewComponents.buyListManager,   // 商品管理 -> 采购单管理 (component=17)
   /* 18 */ viewComponents.inStoreList,      // 商品管理 -> 入库列表 (component=18)
+  /* 20 */ viewComponents.listStore,        // 商品管理 -> 仓库列表 (component=20)
 ];
 
 const currentComponent = shallowRef(null); // 修改初始值，等待 onMounted 中恢复或设置

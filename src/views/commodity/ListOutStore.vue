@@ -1,5 +1,5 @@
 <template>
-  <h2>出租单列表</h2>
+  <h2>出库单列表</h2>
 <!-- table -->
   <el-table :data="outStoreList" style="width: 100%">
     <el-table-column  prop="storeName" label="仓库名称"/>
@@ -17,7 +17,7 @@
     <el-table-column fixed="right" label="操作" width="240">
       <template #default="scope">
         <el-button link type="primary" size="small" v-if="scope.row.isOut==0"
-                   @click="confirmIsIn(scope.row.insId)">确认出库</el-button>
+                   @click="confirmIsOut(scope.row.outsId)">确认出库</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -38,6 +38,7 @@
 import {onMounted, ref} from "vue";
 
 import axios from 'axios';
+import {ElMessage} from "element-plus";
 
 //声明出库单集合
 const outStoreList=ref([]);
@@ -53,7 +54,7 @@ function queryItmOutServiceList(pageNum){
     console.log(error);
   })
 }
-//加载调用函数/* 16 */ null,
+//加载调用函数
 onMounted(function(){
   queryItmOutServiceList(1);
 })
@@ -61,6 +62,21 @@ onMounted(function(){
 //定义分页按钮的回调函数
 function handlerOutStorePageChange(pageNum){
   queryItmOutServiceList(pageNum);
+}
+
+//定义函数发生入库单确认请求
+function confirmIsOut(id){
+  axios.get("http://localhost:8080/updateOutStore?id="+id)
+  .then((response)=>{
+    if(response.data.code==200){
+      queryItmOutServiceList(1); //刷新列表
+    }
+    ElMessage(response.data.message);
+
+  })
+  .catch((err)=>{
+    console.log(err);
+  })
 }
 </script>
 
