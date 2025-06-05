@@ -21,7 +21,8 @@ import CustomerArea from "./views/statistics/CustomerArea.vue";
 // 导入新创建的组件和组合式函数
 import SidebarMenu from "@/components/layout/SidebarMenu.vue";
 import useMenu from "@/composables/useMenu";
-import { onMounted, shallowRef, ref } from "vue";
+import { onMounted, shallowRef, ref, computed } from "vue";
+import { useRoute } from 'vue-router'
 
 // API 服务
 import { appApi } from '@/api/app';
@@ -72,6 +73,7 @@ const views = [
 
 const currentComponent = shallowRef(null);
 const error = ref(null);
+const route = useRoute()
 
 // 使用菜单组合式函数
 const {
@@ -82,6 +84,11 @@ const {
   setActiveMenu,
   initializeMenu
 } = useMenu();
+
+// 计算属性：判断当前是否是认证页面（登录/注册）
+const isAuthPage = computed(() => {
+  return route.path === '/login' || route.path === '/register'
+})
 
 // --- 方法定义 ---
 const handlerSelect = async (menuId) => {
@@ -115,7 +122,13 @@ onMounted(async () => {
 
 <template>
   <div class="app-container">
-    <el-container class="main-container">
+    <!-- 认证页面（登录/注册） -->
+    <div v-if="isAuthPage">
+      <router-view></router-view>
+    </div>
+    
+    <!-- 主应用布局 -->
+    <el-container v-else class="main-container">
       <!-- 顶部Header区域 -->
       <el-header class="app-header">
         <div class="header-content">

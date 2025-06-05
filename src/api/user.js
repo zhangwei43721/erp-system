@@ -2,6 +2,22 @@ import request from './config'
 
 // 用户管理相关接口
 export const userApi = {
+    // 用户登录
+    login(username, password) {
+        return request.post('/login', {
+            username,
+            password
+        })
+    },
+    
+    // 用户注册
+    register(username, password) {
+        return request.post('/register', {
+            username,
+            password
+        })
+    },
+
     // 获取用户列表（分页）
     getUserList(pageNum, pageSize = 10) {
         return request.get(`/userList?pageNum=${pageNum}&pageSize=${pageSize}`)
