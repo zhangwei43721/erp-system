@@ -17,6 +17,9 @@ import InStoreList from "./views/commodity/InStoreList.vue";
 import ListOutStore from "./views/commodity/ListOutStore.vue";
 import ListStore from "./views/commodity/ListStore.vue";
 import CustomerArea from "./views/statistics/CustomerArea.vue";
+import EmployeeCount from "./views/statistics/EmployeeCount.vue";
+import AfterSaleCount from "@/views/statistics/AfterSaleCount.vue";
+import YearNumCount from "./views/statistics/YearNumCount.vue";
 
 // 导入新创建的组件和组合式函数
 import SidebarMenu from "@/components/layout/SidebarMenu.vue";
@@ -46,6 +49,9 @@ const viewComponents = {
   listOutStore: ListOutStore,
   listStore: ListStore,
   customerArea: CustomerArea,
+  employeeCount: EmployeeCount,
+  afterSaleCount: AfterSaleCount,
+  yearNumCount: YearNumCount
 };
 
 const views = [
@@ -68,7 +74,10 @@ const views = [
   /* 19 */ viewComponents.listOutStore,     // 商品管理 -> 出库列表 (component=19)
   /* 17 */ viewComponents.buyListManager,   // 商品管理 -> 采购单管理 (component=17)
   /* 18 */ viewComponents.inStoreList,      // 商品管理 -> 入库列表 (component=18)
-  /* 20 */ viewComponents.listStore,        // 商品管理 -> 仓库列表 (component=20)
+  /* 19 */ viewComponents.listStore,        // 商品管理 -> 仓库列表 (component=19)
+  /* 20 */ viewComponents.employeeCount,     // 数据统计 -> 员工信息统计 (component=20)
+  /* 21 */ viewComponents.afterSaleCount,     // 数据统计 -> 售后服务统计 (component=21)
+  /* 22 */ viewComponents.yearNumCount        // 数据统计 -> 年度数量统计 (component=22)
 ];
 
 const currentComponent = shallowRef(null);
@@ -122,13 +131,14 @@ onMounted(async () => {
 
 <template>
   <div class="app-container">
-    <!-- 认证页面（登录/注册） -->
+    <!-- 认证页面（登录/注册）
     <div v-if="isAuthPage">
       <router-view></router-view>
-    </div>
+    </div> -->
     
     <!-- 主应用布局 -->
-    <el-container v-else class="main-container">
+    <!-- <el-container v-else class="main-container"> -->
+    <el-container class="main-container">
       <!-- 顶部Header区域 -->
       <el-header class="app-header">
         <div class="header-content">

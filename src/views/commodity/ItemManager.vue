@@ -64,9 +64,9 @@
     <el-table-column label="商品名称" prop="itemName" />
     <el-table-column label="商品类型" prop="cateName" />
     <el-table-column label="品牌" prop="brandName" />
-    <el-table-column label="库存" prop="store" width="80" />
+    <el-table-column label="库存" prop="store" />
     <el-table-column label="销售价格" prop="sellPrice" />
-    <el-table-column label="状态" prop="statue" width="80">
+    <el-table-column label="状态" prop="statue">
       <template #default="{ row }">
         <el-tag :type="row.statue === 0 ? 'success' : 'danger'">
           {{ row.statue === 0 ? '上架' : '下架' }}
@@ -74,7 +74,7 @@
       </template>
     </el-table-column>
 
-    <el-table-column fixed="right" label="操作" width="200">
+    <el-table-column fixed="right" label="操作" width="240">
       <template #default="{ row }">
         <el-button link size="small" type="primary" @click="handleDeleteItem(row.id)">删除</el-button>
         <el-button link size="small" type="primary" @click="openUpdateDialog(row)">修改</el-button>
