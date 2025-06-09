@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { resolve } from 'path'
 
 export default defineConfig({
-  base: '/erpfront/', // 添加 base 配置，使用仓库名作为基础路径
+  base: '/erp-system/',
   plugins: [vue()],
   resolve: {
     alias: {
