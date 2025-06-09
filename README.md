@@ -1,6 +1,9 @@
 # erpfront
 ## 客户管理系统前端实现
 
+这是一个基于 Vue 3 和 Vite 的客户管理系统前端实现，旨在帮助企业高效管理客户信息、销售过程和售后服务。该项目提供了直观的用户界面和丰富的功能模块，支持企业提升客户关系管理效率。
+
+GitHub Pages 部署地址：[https://zhangwei43721.github.io/erp-system/](https://zhangwei43721.github.io/erp-system/)
 ### 实现的功能
 
 #### **‌客户信息管理‌**
