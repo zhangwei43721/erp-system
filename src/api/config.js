@@ -7,7 +7,8 @@ const baseURL = isProd ? 'https://erpapi.skyforever.top' : 'http://localhost:808
 // 创建 axios 实例
 const request = axios.create({
     baseURL,
-    timeout: 5000
+    timeout: 5000,
+    withCredentials: true //添加这一行，让所有通过此实例发出的请求都携带凭证（如Cookie）
 })
 
 // 请求拦截器
