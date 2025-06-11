@@ -1,8 +1,12 @@
 import axios from 'axios'
 
+// 根据环境变量自动切换 baseURL
+const isProd = process.env.NODE_ENV === 'production'
+const baseURL = isProd ? 'https://erpapi.skyforever.top' : 'http://localhost:8080'
+
 // 创建 axios 实例
 const request = axios.create({
-    baseURL: 'https://erpapi.skyforever.top',
+    baseURL,
     timeout: 5000
 })
 
