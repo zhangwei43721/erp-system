@@ -70,7 +70,14 @@ const handleLogin = () => {
     userApi.login(form.value.username, form.value.password)
       .then(response => {
         const token = response.data.data.token
+        const userId = response.data.data.userId
+        const username = response.data.data.username
+        
+        // 保存token和用户信息到localStorage
         localStorage.setItem('token', token)
+        localStorage.setItem('userId', userId)
+        localStorage.setItem('username', username || form.value.username)
+        
         router.push('/')
         ElMessage.success('登录成功')
       })
