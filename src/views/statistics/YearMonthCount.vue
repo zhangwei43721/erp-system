@@ -23,19 +23,16 @@
 </template>
 
 <script setup>
-
 import {onMounted, reactive, ref} from "vue";
-import axios from "axios";
 import * as echarts from "echarts";
+import { statisticsApi } from '@/api/statistics';
 //声明表单数据
 const yearForm=reactive({
   year:''
 });
-//声明选项集合
 const yearList=ref([]);
-//定义发送请求，加载年份数据
 function loadYear(){
-  axios.get("http://localhost:8080/queryYear")
+  statisticsApi.getYearList()
   .then((response)=>{
     yearList.value=response.data;
   })
@@ -43,20 +40,14 @@ function loadYear(){
     console.log(error);
   })
 }
-//页面加载调用函数
 onMounted(function(){
   loadYear();
 });
-//下拉列表框选择内容发生变化的回调函数
 function handleYearMthSell(year){
-  console.log(year);
-  //发生请求加载数据
-  axios.get("http://localhost:8080/countSell?year="+year)
+  statisticsApi.getYearMonthSell(year)
   .then((response)=>{
-
     var sellDom = document.getElementById('sellCharts');
     var sellChart = echarts.init(sellDom);
-
     var option = {
       xAxis: {
         type: 'category',
@@ -76,14 +67,11 @@ function handleYearMthSell(year){
         }
       ]
     };
-
-
     option && sellChart.setOption(option);
-
-
   })
-  .catch((error)=>{})
-
+  .catch((error)=>{
+    console.log(error);
+  })
 }
 </script>
 

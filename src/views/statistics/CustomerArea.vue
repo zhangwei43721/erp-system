@@ -7,15 +7,11 @@
 <script setup>
 import * as echarts from 'echarts';
 import {onMounted} from "vue";
-import axios from "axios";
+import { statisticsApi } from '@/api/statistics';
 
-//定义函数统计客户地区分布
 function countCustomerArea(){
-  //发送ajax请求，获得统计数据
-  axios.get("http://localhost:8080/countCust")
+  statisticsApi.getCustomerArea()
   .then((response)=>{
-
-    //响应成功渲染图表
     var custDom = document.getElementById('main');
     var custChart = echarts.init(custDom);
     var option = {
@@ -50,16 +46,12 @@ function countCustomerArea(){
         }
       ]
     };
-
     option && custChart.setOption(option);
-
   })
   .catch((error)=>{
     console.log(error);
   })
-
 }
-//加载视图调用函数
 onMounted(function(){
   countCustomerArea();
 })

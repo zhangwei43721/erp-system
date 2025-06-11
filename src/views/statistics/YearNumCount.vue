@@ -22,9 +22,9 @@
 </template>
 
 <script setup>
-  import axios from "axios";
-  import * as echars from 'echarts';
-  import {onMounted, reactive, ref} from "vue";
+import * as echars from 'echarts';
+import {onMounted, reactive, ref} from "vue";
+import { statisticsApi } from '@/api/statistics';
 
   //声明表单数据
   const yearForm=reactive({
@@ -34,7 +34,7 @@
   const yearList=ref([]);
   //定义发送请求，加载年份数据
   function loadYear(){
-    axios.get("http://localhost:8080/queryYear")
+    statisticsApi.getYearList()
         .then((response)=>{
           yearList.value=response.data;
         })
@@ -48,7 +48,7 @@
   });
   //////////////////////////////////////////////////////////////////
   function countNum(year){
-    axios.get("http://localhost:8080/countNum?year="+year)
+    statisticsApi.getYearNum(year)
     .then((response)=>{
       //进行echars 控件渲染
       var numDom=document.getElementById("num");

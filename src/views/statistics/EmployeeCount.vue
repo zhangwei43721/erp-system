@@ -7,18 +7,14 @@
 
 </template>
 <script setup>
-//定义函数发生请求，统计年龄分部
 import * as echarts from 'echarts'
 import {onMounted} from "vue";
-import axios from "axios";
+import { statisticsApi } from '@/api/statistics';
 function countEmpAge(){
-  axios.get("http://localhost:8080/countEmpAge")
+  statisticsApi.getEmpAge()
   .then(response=>{
-    //获得显示echarts控件的dom
     var empDom=document.getElementById("empInfo");
-    //创建echarts对象
     var ageEcharts=echarts.init(empDom)
-
     var option = {
       tooltip: {
         trigger: 'item'
@@ -29,7 +25,7 @@ function countEmpAge(){
       },
       series: [
         {
-          name: '员工年龄分部',
+          name: '员工年龄分布',
           type: 'pie',
           radius: ['40%', '70%'],
           avoidLabelOverlap: false,
@@ -59,21 +55,14 @@ function countEmpAge(){
   })
   .catch(error=>{})
 }
-//页面加载调用函数
 onMounted(function(){
   countEmpAge();
 })
-
-//定义函数统计员工学历分布
 function countEmpEdu(){
-  axios.get("http://localhost:8080/countEmpEdu")
+  statisticsApi.getEmpEdu()
   .then((response)=>{
-    //实现echarts控件数据的渲染
-    //获得显示echarts控件的dom
     var empDom=document.getElementById("empInfo");
-    //创建echarts对象
     var eudEcharts=echarts.init(empDom)
-
     var option = {
       tooltip: {
         trigger: 'item'
@@ -84,7 +73,7 @@ function countEmpEdu(){
       },
       series: [
         {
-          name: '员工学历分部',
+          name: '员工学历分布',
           type: 'pie',
           radius: ['40%', '70%'],
           avoidLabelOverlap: false,
@@ -112,9 +101,7 @@ function countEmpEdu(){
     };
     option&&eudEcharts.setOption(option);
   })
-  .catch((error)=>{
-    console.log(error);
-  });
+  .catch(error=>{})
 }
 </script>
 

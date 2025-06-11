@@ -8,117 +8,107 @@
 </template>
 
 <script setup>
-  //定义函数发生请求，加载投诉类型统计数据
-  import * as echarts from "echarts";
-  import {onMounted} from "vue";
-  import axios from "axios";
+import * as echarts from "echarts";
+import {onMounted} from "vue";
+import { statisticsApi } from '@/api/statistics';
 
-  function questionTypeCount(){
-    axios.get("http://localhost:8080/countQuestionType")
-    .then((response)=>{
-      //获得显示echarts控件的dom
-      var questionDom=document.getElementById("questionInfo");
-      //创建echarts对象
-      var typeEcharts=echarts.init(questionDom)
-
-      var option = {
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          top: '5%',
-          left: 'center'
-        },
-        series: [
-          {
-            name: '投诉问题类型数据',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            padAngle: 5,
-            itemStyle: {
-              borderRadius: 10
-            },
+function questionTypeCount(){
+  statisticsApi.getQuestionType()
+  .then((response)=>{
+    var questionDom=document.getElementById("questionInfo");
+    var typeEcharts=echarts.init(questionDom)
+    var option = {
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        top: '5%',
+        left: 'center'
+      },
+      series: [
+        {
+          name: '投诉问题类别数据',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          padAngle: 5,
+          itemStyle: {
+            borderRadius: 10
+          },
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
             label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 40,
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data:response.data
-          }
-        ]
-      };
-      option&& typeEcharts.setOption(option);
-    })
-    .catch((error)=>{
-      console.log(error);
-    });
-  }
-  //页面加载调用函数
-  onMounted(function(){
-    questionTypeCount();
+              show: true,
+              fontSize: 40,
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data:response.data
+        }
+      ]
+    };
+    option&& typeEcharts.setOption(option);
   })
-
-
-  //定义函数发生按照回复状态进行统计的请求
-  function questionStateCount(){
-    axios.get("http://localhost:8080/countQuestionState")
-    .then((response)=>{
-      //获得dom对象
-      var quesDom=document.getElementById("questionInfo");
-      //初始化echarts对象
-      var stateEcharts=echarts.init(quesDom)
-      var option = {//完成echarts控件渲染的配置
-        tooltip: {
-          trigger: 'item'
-        },
-        legend: {
-          top: '5%',
-          left: 'center'
-        },
-        series: [
-          {
-            name: '回复状态统计',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            padAngle: 5,
-            itemStyle: {
-              borderRadius: 10
-            },
+  .catch((error)=>{
+    console.log(error);
+  });
+}
+onMounted(function(){
+  questionTypeCount();
+})
+function questionStateCount(){
+  statisticsApi.getQuestionState()
+  .then((response)=>{
+    var quesDom=document.getElementById("questionInfo");
+    var stateEcharts=echarts.init(quesDom)
+    var option = {
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        top: '5%',
+        left: 'center'
+      },
+      series: [
+        {
+          name: '投诉状态数据',
+          type: 'pie',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
+          padAngle: 5,
+          itemStyle: {
+            borderRadius: 10
+          },
+          label: {
+            show: false,
+            position: 'center'
+          },
+          emphasis: {
             label: {
-              show: false,
-              position: 'center'
-            },
-            emphasis: {
-              label: {
-                show: true,
-                fontSize: 40,
-                fontWeight: 'bold'
-              }
-            },
-            labelLine: {
-              show: false
-            },
-            data: response.data
-          }
-        ]
-      };
-      option && stateEcharts.setOption(option);
-    })
-    .catch((error)=>{
-      console.log(error);
-    });
-  }
+              show: true,
+              fontSize: 40,
+              fontWeight: 'bold'
+            }
+          },
+          labelLine: {
+            show: false
+          },
+          data:response.data
+        }
+      ]
+    };
+    option&& stateEcharts.setOption(option);
+  })
+  .catch((error)=>{
+    console.log(error);
+  });
+}
 </script>
 
 <style scoped>
