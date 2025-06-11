@@ -69,13 +69,13 @@ const handleLogin = () => {
     // 调用登录API
     userApi.login(form.value.username, form.value.password)
       .then(response => {
-        const token = response.data.token
+        const token = response.data.data.token
         localStorage.setItem('token', token)
         router.push('/')
         ElMessage.success('登录成功')
       })
       .catch(error => {
-        ElMessage.error('登录失败: ' + (error.response?.data?.message || error.message))
+        ElMessage.error('登录失败: ' + (error.response?.data?.data?.message || error.response?.data?.message || error.message))
       })
       .finally(() => {
         loading.value = false

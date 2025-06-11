@@ -7,14 +7,18 @@ const baseURL = isProd ? 'https://erpapi.skyforever.top' : 'http://localhost:808
 // 创建 axios 实例
 const request = axios.create({
     baseURL,
-    timeout: 5000,
-    withCredentials: true //添加这一行，让所有通过此实例发出的请求都携带凭证（如Cookie）
+    timeout: 5000
 })
 
 // 请求拦截器
 request.interceptors.request.use(
     config => {
-        // 在这里可以添加token等通用请求头
+        // 从本地存储获取 token
+        const token = localStorage.getItem('token')
+        if (token) {
+            // 统一加上 Authorization 头
+            config.headers['Authorization'] = 'Bearer ' + token
+        }
         return config
     },
     error => {
@@ -28,6 +32,11 @@ request.interceptors.response.use(
         return response
     },
     error => {
+        // 可统一处理 401 等错误
+        if (error.response && error.response.status === 401) {
+            // 例如跳转到登录页
+            // window.location.href = '/login'
+        }
         return Promise.reject(error)
     }
 )

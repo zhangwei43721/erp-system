@@ -131,14 +131,13 @@ onMounted(async () => {
 
 <template>
   <div class="app-container">
-    <!-- 认证页面（登录/注册）
     <div v-if="isAuthPage">
       <router-view></router-view>
-    </div> -->
+    </div>
     
     <!-- 主应用布局 -->
-    <!-- <el-container v-else class="main-container"> -->
-    <el-container class="main-container">
+    <el-container v-else class="main-container">
+
       <!-- 顶部Header区域 -->
       <el-header class="app-header">
         <div class="header-content">
