@@ -57,13 +57,13 @@ const rules = {
   ],
   confirmPassword: [
     { required: true, message: '请确认新密码', trigger: 'blur' },
-    { 
+    {
       validator: (rule, value, callback) => {
-        value !== profile.form.newPassword 
+        value !== profile.form.newPassword
           ? callback(new Error('两次输入的密码不一致'))
           : callback();
-      }, 
-      trigger: 'blur' 
+      },
+      trigger: 'blur'
     }
   ]
 };
@@ -83,7 +83,7 @@ const handleLogout = async () => {
     ['token', 'username', 'userId'].forEach(key => localStorage.removeItem(key));
     router.push('/login');
     ElMessage.success('已退出登录');
-  } catch {}
+  } catch { }
 };
 
 const showProfile = () => {
@@ -94,7 +94,7 @@ const showProfile = () => {
 const submitProfile = () => {
   profileFormRef.value.validate(async (valid) => {
     if (!valid) return;
-    
+
     profile.loading = true;
     try {
       await userApi.updateUser(profile.form);
@@ -134,31 +134,41 @@ onMounted(async () => {
 <template>
   <div style="height: 100vh;">
     <router-view v-if="isAuthPage" />
-    
+
     <el-container v-else style="height: 100%;">
       <!-- 顶部导航 -->
       <el-header style="background: var(--el-color-primary); color: white;">
         <div style="display: flex; align-items: center; justify-content: space-between; height: 100%;">
           <div style="display: flex; align-items: center; gap: 12px;">
-            <el-icon size="24"><House /></el-icon>
+            <el-icon size="24">
+              <House />
+            </el-icon>
             <span style="font-size: 18px; font-weight: bold;">ERP管理系统</span>
             <el-tag size="small" type="info">ikun小组</el-tag>
           </div>
-          
+
           <el-dropdown @command="handleCommand">
             <div style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px;">
-              <el-icon><User /></el-icon>
+              <el-icon>
+                <User />
+              </el-icon>
               <span>{{ username }}</span>
-              <el-icon><ArrowDown /></el-icon>
+              <el-icon>
+                <ArrowDown />
+              </el-icon>
             </div>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item command="profile">
-                  <el-icon><Edit /></el-icon>
+                  <el-icon>
+                    <Edit />
+                  </el-icon>
                   修改个人信息
                 </el-dropdown-item>
                 <el-dropdown-item command="logout">
-                  <el-icon><SwitchButton /></el-icon>
+                  <el-icon>
+                    <SwitchButton />
+                  </el-icon>
                   退出登录
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -169,29 +179,14 @@ onMounted(async () => {
 
       <el-container>
         <!-- 侧边栏 -->
-        <SidebarMenu
-          :menus="menus"
-          :activeMenuId="activeMenuId"
-          :isLoading="isLoading"
-          :error="error"
-          :hasMenus="hasMenus"
-          @select="handlerSelect"
-          @refresh="initializeMenu"
-          @clear-error="error = null"
-        />
+        <SidebarMenu :menus="menus" :activeMenuId="activeMenuId" :isLoading="isLoading" :error="error"
+          :hasMenus="hasMenus" @select="handlerSelect" @refresh="initializeMenu" @clear-error="error = null" />
 
         <!-- 主内容 -->
         <el-main>
           <el-skeleton v-if="isLoading" :rows="6" animated />
-          
-          <el-alert
-            v-else-if="error"
-            :title="error"
-            type="error"
-            show-icon
-            closable
-            @close="error = null"
-          />
+
+          <el-alert v-else-if="error" :title="error" type="error" show-icon closable @close="error = null" />
 
           <keep-alive v-else>
             <component :is="currentComponent" />
@@ -199,49 +194,29 @@ onMounted(async () => {
         </el-main>
       </el-container>
     </el-container>
-    
+
     <!-- 个人信息对话框 -->
     <el-dialog v-model="profile.visible" title="修改个人信息" width="400px">
       <div style="text-align: center; margin-bottom: 20px;">
         <el-avatar size="large" icon="User" />
         <div style="margin-top: 8px; font-weight: bold;">{{ username }}</div>
       </div>
-      
-      <el-form
-        :model="profile.form"
-        :rules="rules"
-        ref="profileFormRef"
-        label-width="80px"
-      >
+
+      <el-form :model="profile.form" :rules="rules" ref="profileFormRef" label-width="80px">
         <el-form-item label="用户名">
           <el-input v-model="profile.form.username" disabled />
         </el-form-item>
         <el-form-item label="原密码" prop="oldPassword">
-          <el-input
-            v-model="profile.form.oldPassword"
-            type="password"
-            show-password
-            placeholder="请输入原密码"
-          />
+          <el-input v-model="profile.form.oldPassword" type="password" show-password placeholder="请输入原密码" />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input
-            v-model="profile.form.newPassword"
-            type="password"
-            show-password
-            placeholder="请输入新密码"
-          />
+          <el-input v-model="profile.form.newPassword" type="password" show-password placeholder="请输入新密码" />
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input
-            v-model="profile.form.confirmPassword"
-            type="password"
-            show-password
-            placeholder="请再次输入新密码"
-          />
+          <el-input v-model="profile.form.confirmPassword" type="password" show-password placeholder="请再次输入新密码" />
         </el-form-item>
       </el-form>
-      
+
       <template #footer>
         <el-button @click="profile.visible = false">取消</el-button>
         <el-button type="primary" :loading="profile.loading" @click="submitProfile">
@@ -258,13 +233,15 @@ onMounted(async () => {
   background: var(--el-color-primary);
   color: #fff;
 }
+
 .el-header .el-icon,
 .el-header span,
 .el-header .el-tag {
   color: #fff !important;
 }
+
 .el-header .el-tag {
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   border: none;
 }
 

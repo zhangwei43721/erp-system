@@ -77,5 +77,5 @@ export const itemApi = {
 
 // 上传图片 URL
 export const uploadImageUrl = process.env.NODE_ENV === 'production'
-  ? 'https://erpapi.skyforever.top/uploadImg'
-  : 'http://localhost:8080/uploadImg'
+    ? 'https://erpapi.skyforever.top/uploadImg'
+    : 'http://localhost:8080/uploadImg'

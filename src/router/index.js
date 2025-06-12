@@ -30,7 +30,7 @@ const router = createRouter({
 // 路由守卫
 router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('token')
-    
+
     // 需要登录但未登录
     if (to.matched.some(record => record.meta.requiresAuth)) {
         if (!token) {

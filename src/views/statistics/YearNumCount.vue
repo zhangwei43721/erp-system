@@ -2,18 +2,8 @@
   <h2>请选择年份</h2>
   <el-form :model="yearForm" label-width="120px" :inline="true">
     <el-form-item label="年份" style="width: 34%">
-      <el-select
-          v-model="yearForm.year"
-          class="m-2"
-          placeholder="请选择年份"
-          @change="countNum"
-      >
-        <el-option
-            v-for="item in yearList"
-            :key="item.year"
-            :label="item.label"
-            :value="item.year"
-        />
+      <el-select v-model="yearForm.year" class="m-2" placeholder="请选择年份" @change="countNum">
+        <el-option v-for="item in yearList" :key="item.year" :label="item.label" :value="item.year" />
       </el-select>
     </el-form-item>
   </el-form>
@@ -23,42 +13,42 @@
 
 <script setup>
 import * as echars from 'echarts';
-import {onMounted, reactive, ref} from "vue";
+import { onMounted, reactive, ref } from "vue";
 import { statisticsApi } from '@/api/statistics';
 
-  //声明表单数据
-  const yearForm=reactive({
-    year:''
-  });
-  //声明选项集合
-  const yearList=ref([]);
-  //定义发送请求，加载年份数据
-  function loadYear(){
-    statisticsApi.getYearList()
-        .then((response)=>{
-          yearList.value=response.data;
-        })
-        .catch((error)=>{
-          console.log(error);
-        })
-  }
-  //页面加载调用函数
-  onMounted(function(){
-    loadYear();
-  });
-  //////////////////////////////////////////////////////////////////
-  function countNum(year){
-    statisticsApi.getYearNum(year)
-    .then((response)=>{
+//声明表单数据
+const yearForm = reactive({
+  year: ''
+});
+//声明选项集合
+const yearList = ref([]);
+//定义发送请求，加载年份数据
+function loadYear() {
+  statisticsApi.getYearList()
+    .then((response) => {
+      yearList.value = response.data;
+    })
+    .catch((error) => {
+      console.log(error);
+    })
+}
+//页面加载调用函数
+onMounted(function () {
+  loadYear();
+});
+//////////////////////////////////////////////////////////////////
+function countNum(year) {
+  statisticsApi.getYearNum(year)
+    .then((response) => {
       //进行echars 控件渲染
-      var numDom=document.getElementById("num");
+      var numDom = document.getElementById("num");
       //创建echarts对象
-      var numEcharts=echars.init(numDom);
+      var numEcharts = echars.init(numDom);
 
       var option = {
         xAxis: {
           type: 'category',
-          data:  response.data.xdata
+          data: response.data.xdata
         },
         yAxis: {
           type: 'value'
@@ -73,12 +63,10 @@ import { statisticsApi } from '@/api/statistics';
 
       option && numEcharts.setOption(option);
     })
-    .catch((error)=>{
+    .catch((error) => {
       console.log(error);
     });
-  }
+}
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>

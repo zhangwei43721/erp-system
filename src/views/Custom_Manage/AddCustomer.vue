@@ -98,9 +98,9 @@ function resetForm() {
 </template>
 
 <style scoped>
- /* scoped样式: CSS只作用于当前组件 */
- /* 设置表单的最大宽度并使其居中显示 */
- .page-title {
-   margin: 0 0 0 0, auto;
- }
+/* scoped样式: CSS只作用于当前组件 */
+/* 设置表单的最大宽度并使其居中显示 */
+.page-title {
+  margin: 0 0 0 0, auto;
+}
 </style>

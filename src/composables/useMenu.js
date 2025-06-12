@@ -7,14 +7,14 @@ export default function useMenu() {
   const isLoading = ref(false)
   const error = ref(null)
   const activeMenuId = ref(null)
-  
+
   const hasMenus = computed(() => menus.value?.length > 0)
-  
+
   // 默认展开所有菜单项
   const defaultOpeneds = computed(() => {
     return menus.value.map(menu => menu.id.toString())
   })
-  
+
   // 查找菜单项
   const findMenuById = (id) => {
     if (!id || !menus.value) return null
@@ -27,7 +27,7 @@ export default function useMenu() {
     }
     return null
   }
-  
+
   // 获取第一个可用的子菜单ID
   const getFirstAvailableSubMenuId = () => {
     if (menus.value?.length > 0) {
@@ -39,7 +39,7 @@ export default function useMenu() {
     }
     return null
   }
-  
+
   // 获取菜单数据
   const fetchMenus = async () => {
     isLoading.value = true
@@ -55,19 +55,19 @@ export default function useMenu() {
       isLoading.value = false
     }
   }
-  
+
   // 菜单结构变化处理
   const handleMenuStructureChanged = () => {
     fetchMenus()
   }
-  
+
   // 初始化菜单
   const initializeMenu = async () => {
     await fetchMenus()
-    
+
     let initialMenuId = null
     const savedMenuId = localStorage.getItem('selectedMenuId')
-    
+
     if (menus.value?.length > 0) {
       if (savedMenuId && findMenuById(savedMenuId)) {
         initialMenuId = savedMenuId
@@ -76,32 +76,32 @@ export default function useMenu() {
         initialMenuId = getFirstAvailableSubMenuId()
       }
     }
-    
+
     activeMenuId.value = initialMenuId
     return initialMenuId
   }
-  
+
   // 设置活动菜单
   const setActiveMenu = (id) => {
     activeMenuId.value = id
     localStorage.setItem('selectedMenuId', id)
   }
-  
+
   // 组件挂载时设置事件监听
   onMounted(() => {
     emitter.on('menu-structure-changed', handleMenuStructureChanged)
-    
+
     // 5秒后自动清除错误信息
     const errorTimer = setInterval(() => {
       if (error.value) error.value = null
     }, 5000)
-    
+
     return () => {
       emitter.off('menu-structure-changed', handleMenuStructureChanged)
       clearInterval(errorTimer)
     }
   })
-  
+
   return {
     menus,
     isLoading,

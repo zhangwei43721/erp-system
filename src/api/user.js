@@ -9,7 +9,7 @@ export const userApi = {
             password
         })
     },
-    
+
     // 用户注册
     register(username, password) {
         return request.post('/register', {

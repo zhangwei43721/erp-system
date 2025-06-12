@@ -4,37 +4,18 @@
       <h2 class="register-title">用户注册</h2>
       <el-form :model="form" :rules="rules" ref="registerForm">
         <el-form-item prop="username">
-          <el-input 
-            v-model="form.username" 
-            placeholder="请输入用户名"
-            prefix-icon="User"
-          ></el-input>
+          <el-input v-model="form.username" placeholder="请输入用户名" prefix-icon="User"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input 
-            v-model="form.password" 
-            type="password" 
-            placeholder="请输入密码"
-            prefix-icon="Lock"
-            show-password
-          ></el-input>
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" prefix-icon="Lock"
+            show-password></el-input>
         </el-form-item>
         <el-form-item prop="confirmPassword">
-          <el-input 
-            v-model="form.confirmPassword" 
-            type="password" 
-            placeholder="请确认密码"
-            prefix-icon="Lock"
-            show-password
-          ></el-input>
+          <el-input v-model="form.confirmPassword" type="password" placeholder="请确认密码" prefix-icon="Lock"
+            show-password></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button 
-            type="primary" 
-            class="register-btn" 
-            @click="handleRegister"
-            :loading="loading"
-          >
+          <el-button type="primary" class="register-btn" @click="handleRegister" :loading="loading">
             注册
           </el-button>
         </el-form-item>
@@ -88,7 +69,7 @@ const rules = {
 const handleRegister = () => {
   registerForm.value.validate(valid => {
     if (!valid) return
-    
+
     loading.value = true
     // 调用注册API
     userApi.register(form.value.username, form.value.password)

@@ -4,28 +4,14 @@
       <h2 class="login-title">ERP系统登录</h2>
       <el-form :model="form" :rules="rules" ref="loginForm">
         <el-form-item prop="username">
-          <el-input 
-            v-model="form.username" 
-            placeholder="请输入用户名"
-            prefix-icon="User"
-          ></el-input>
+          <el-input v-model="form.username" placeholder="请输入用户名" prefix-icon="User"></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input 
-            v-model="form.password" 
-            type="password" 
-            placeholder="请输入密码"
-            prefix-icon="Lock"
-            show-password
-          ></el-input>
+          <el-input v-model="form.password" type="password" placeholder="请输入密码" prefix-icon="Lock"
+            show-password></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button 
-            type="primary" 
-            class="login-btn" 
-            @click="handleLogin"
-            :loading="loading"
-          >
+          <el-button type="primary" class="login-btn" @click="handleLogin" :loading="loading">
             登录
           </el-button>
         </el-form-item>
@@ -64,7 +50,7 @@ const rules = {
 const handleLogin = () => {
   loginForm.value.validate(valid => {
     if (!valid) return
-    
+
     loading.value = true
     // 调用登录API
     userApi.login(form.value.username, form.value.password)
@@ -72,12 +58,12 @@ const handleLogin = () => {
         const token = response.data.data.token
         const userId = response.data.data.userId
         const username = response.data.data.username
-        
+
         // 保存token和用户信息到localStorage
         localStorage.setItem('token', token)
         localStorage.setItem('userId', userId)
         localStorage.setItem('username', username || form.value.username)
-        
+
         router.push('/')
         ElMessage.success('登录成功')
       })

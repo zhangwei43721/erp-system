@@ -18,7 +18,7 @@ const iconCache = new Map()
 const getIcon = (iconName) => {
   if (!iconName) return ElementPlusIconsVue.Document
   if (iconCache.has(iconName)) return iconCache.get(iconName)
-  
+
   const icon = ElementPlusIconsVue[iconName] || ElementPlusIconsVue.Document
   iconCache.set(iconName, icon)
   return icon
@@ -52,38 +52,18 @@ const handleSelect = (index) => {
     </el-skeleton>
 
     <!-- 错误提示 -->
-    <el-alert 
-      v-if="error && !hasMenus" 
-      :title="error" 
-      show-icon 
-      type="error" 
-      @close="$emit('clear-error')" 
-    />
+    <el-alert v-if="error && !hasMenus" :title="error" show-icon type="error" @close="$emit('clear-error')" />
 
     <!-- 菜单内容 -->
-    <el-menu 
-      v-if="hasMenus"
-      :default-active="activeMenuId"
-      class="app-menu"
-      unique-opened
-      @select="handleSelect"
-    >
-      <el-sub-menu 
-        v-for="menu in menus" 
-        :key="menu.id" 
-        :index="menu.id.toString()"
-      >
+    <el-menu v-if="hasMenus" :default-active="activeMenuId" class="app-menu" unique-opened @select="handleSelect">
+      <el-sub-menu v-for="menu in menus" :key="menu.id" :index="menu.id.toString()">
         <template #title>
           <el-icon>
             <component :is="getIcon(menu.iconName)" />
           </el-icon>
           <span>{{ menu.label }}</span>
         </template>
-        <el-menu-item 
-          v-for="subMenu in menu.subMenu" 
-          :key="subMenu.id" 
-          :index="subMenu.id.toString()"
-        >
+        <el-menu-item v-for="subMenu in menu.subMenu" :key="subMenu.id" :index="subMenu.id.toString()">
           <el-icon>
             <component :is="getIcon(subMenu.iconName)" />
           </el-icon>
