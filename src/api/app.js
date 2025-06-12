@@ -9,8 +9,8 @@ export const appApi = {
         })
     },
 
-    // 获取菜单列表
+    // 获取个人菜单列表
     getMenus() {
-        return request.get('/listMenus')
+        return request.get('/queryUserMenus')
     }
 }
